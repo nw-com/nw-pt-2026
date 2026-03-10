@@ -12,6 +12,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#dc2626">
+    <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='48'%20fill='rgb(220%2C38%2C38)'/%3E%3Cg%20transform='translate(48%2C48)scale(4)'%20fill='none'%20stroke='%23333333'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M20%2013c0%205-3.5%207.5-7.66%208.95a1%201%200%200%201-.67-.01C7.5%2020.5%204%2018%204%2013V6a1%201%200%200%201%201-1c2%200%204.5-1.2%206.24-2.72a1.17%201%200%200%201%201.52%200C14.51%203.81%2017%205%2019%205a1%201%200%200%201%201%201z'/%3E%3Cpath%20d='m9%2012%202%202%204-4'/%3E%3C/g%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='48'%20fill='rgb(220%2C38%2C38)'/%3E%3Cg%20transform='translate(48%2C48)scale(4)'%20fill='none'%20stroke='%23333333'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M20%2013c0%205-3.5%207.5-7.66%208.95a1%201%200%200%201-.67-.01C7.5%2020.5%204%2018%204%2013V6a1%201%200%200%201%201-1c2%200%204.5-1.2%206.24-2.72a1.17%201%200%200%201%201.52%200C14.51%203.81%2017%205%2019%205a1%201%200%200%201%201%201z'/%3E%3Cpath%20d='m9%2012%202%202%204-4'/%3E%3C/g%3E%3C/svg%3E">
     
@@ -163,10 +164,10 @@
             <div class="absolute inset-0 flex items-center justify-center p-4">
                 <div class="w-[80vw] h-[80vh] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col">
                     <input id="profile-avatar-input" type="file" accept="image/*" class="hidden" onchange="handleProfileAvatarSelected(event)">
-                    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-                        <div class="text-gray-900 text-base tracking-widest">個人資訊</div>
-                        <button onclick="closeProfileModal()" class="w-10 h-10 rounded-xl bg-white active:scale-90 transition-all flex items-center justify-center">
-                            <i data-lucide="x" class="w-5 h-5 text-gray-700"></i>
+                    <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
+                        <div class="text-[#333333] text-base tracking-widest">個人資訊</div>
+                        <button onclick="closeProfileModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
+                            <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
                         </button>
                     </div>
                     <div class="flex-1 overflow-auto p-6">
@@ -180,6 +181,7 @@
                                 <div id="profile-info-role" class="text-gray-500 text-sm tracking-widest truncate">-</div>
                             </div>
                         </div>
+                        <div id="profile-avatar-status" class="mt-3 text-xs tracking-widest text-gray-500 hidden"></div>
                         <div class="mt-6 grid grid-cols-1 gap-3">
                             <div class="p-4 rounded-2xl border border-gray-100 bg-gray-50">
                                 <div class="text-gray-400 text-[11px] tracking-widest">Email</div>
@@ -193,9 +195,30 @@
                                 <div class="text-gray-400 text-[11px] tracking-widest">Line ID</div>
                                 <div id="profile-info-line" class="text-gray-900 text-sm tracking-widest break-all">-</div>
                             </div>
+                            <div class="p-4 rounded-2xl border border-gray-100 bg-gray-50">
+                                <div class="text-gray-400 text-[11px] tracking-widest">修改密碼</div>
+                                <div class="mt-3 space-y-3">
+                                    <div class="relative">
+                                        <input id="pw-new" type="password" autocomplete="new-password" placeholder="新密碼（至少 6 碼）" class="w-full px-4 py-3 pr-14 bg-white rounded-2xl border border-gray-200 focus:ring-2 focus:ring-red-500 transition-all text-sm tracking-widest">
+                                        <button type="button" onclick="toggleInlinePassword('pw-new','pw-eye-new')" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/60 border border-gray-200 flex items-center justify-center text-gray-500 active:scale-90 transition-transform">
+                                            <i id="pw-eye-new" data-lucide="eye" class="w-5 h-5"></i>
+                                        </button>
+                                    </div>
+                                    <div class="relative">
+                                        <input id="pw-confirm" type="password" autocomplete="new-password" placeholder="確認新密碼" class="w-full px-4 py-3 pr-14 bg-white rounded-2xl border border-gray-200 focus:ring-2 focus:ring-red-500 transition-all text-sm tracking-widest">
+                                        <button type="button" onclick="toggleInlinePassword('pw-confirm','pw-eye-confirm')" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/60 border border-gray-200 flex items-center justify-center text-gray-500 active:scale-90 transition-transform">
+                                            <i id="pw-eye-confirm" data-lucide="eye" class="w-5 h-5"></i>
+                                        </button>
+                                    </div>
+                                    <button onclick="handleChangePassword()" class="w-full py-3 rounded-2xl bg-white text-[#333333] tracking-widest active:scale-95 transition-all border border-gray-200">
+                                        確認修改
+                                    </button>
+                                    <div id="profile-password-status" class="text-xs tracking-widest hidden"></div>
+                                </div>
+                            </div>
                         </div>
                         <div class="mt-6">
-                            <button onclick="handleProfileLogoutFromModal()" class="w-full py-3 rounded-2xl bg-red-600 text-white tracking-widest active:scale-95 transition-all">
+                            <button onclick="handleProfileLogoutFromModal()" class="w-full py-3 rounded-2xl bg-red-600 text-[#333333] tracking-widest active:scale-95 transition-all">
                                 登出
                             </button>
                         </div>
@@ -208,7 +231,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, browserSessionPersistence, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -234,6 +257,12 @@
         const BOOTSTRAP_ADMIN_EMAIL = 'nwapp.eason@gmail.com';
         const LOGIN_PREF_KEY = 'nw_login_pref_v1';
         const PROFILE_AVATAR_KEY_PREFIX = 'nw_profile_avatar_v1_';
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
+        }
 
         let currentUserData = null;
         let activeTab = 'ownerList';
@@ -349,6 +378,7 @@
             const role = (userData && userData.role) ? userData.role : '';
             const email = (userData && userData.email) ? userData.email : ((user && user.email) ? user.email : '');
             const uid = (userData && userData.uid) ? userData.uid : ((user && user.uid) ? user.uid : '');
+            const avatarDataUrl = (userData && userData.avatarDataUrl) ? userData.avatarDataUrl : '';
             const photoURL = (user && user.photoURL) ? user.photoURL : ((userData && userData.photoURL) ? userData.photoURL : '');
             let localAvatar = '';
             try {
@@ -356,7 +386,7 @@
             } catch {
                 localAvatar = '';
             }
-            const resolvedPhotoURL = localAvatar || photoURL;
+            const resolvedPhotoURL = avatarDataUrl || localAvatar || photoURL;
 
             const setText = (id, value) => {
                 const el = document.getElementById(id);
@@ -391,7 +421,7 @@
             const displayName = role === '系統管理員' ? '王騰毅' : name;
             setText('header-profile-name', displayName || '-');
             setText('profile-info-name', displayName);
-            setText('profile-info-role', role ? `<${role}>` : '');
+            setText('profile-info-role', role || '-');
             setText('profile-info-email', email);
             setText('profile-info-phone', '0922760761');
             setText('profile-info-line', 'beebox.com');
@@ -422,26 +452,153 @@
             input.click();
         };
 
-        window.handleProfileAvatarSelected = (e) => {
+        window.toggleInlinePassword = (inputId, iconId) => {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const icon = document.getElementById(iconId);
+
+            const next = input.type === 'password' ? 'text' : 'password';
+            input.type = next;
+
+            if (icon) {
+                icon.setAttribute('data-lucide', next === 'password' ? 'eye' : 'eye-off');
+                lucide.createIcons();
+            }
+        };
+
+        function setProfileStatus(id, message, tone = 'muted') {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const text = String(message || '').trim();
+            if (!text) {
+                el.classList.add('hidden');
+                el.innerText = '';
+                return;
+            }
+            el.classList.remove('hidden');
+            el.innerText = text;
+            el.classList.remove('text-gray-500', 'text-red-600', 'text-green-600');
+            if (tone === 'error') el.classList.add('text-red-600');
+            else if (tone === 'success') el.classList.add('text-green-600');
+            else el.classList.add('text-gray-500');
+        }
+
+        window.handleProfileAvatarSelected = async (e) => {
             const file = e && e.target && e.target.files ? e.target.files[0] : null;
             if (!file) return;
+            e.target.value = '';
 
             const uid = (currentUserData && currentUserData.uid) ? currentUserData.uid : (auth.currentUser && auth.currentUser.uid ? auth.currentUser.uid : '');
             if (!uid) return;
+            if (!file.type || !file.type.startsWith('image/')) {
+                setProfileStatus('profile-avatar-status', '請選擇圖片檔案', 'error');
+                return;
+            }
+            if (file.size > 3 * 1024 * 1024) {
+                setProfileStatus('profile-avatar-status', '圖片太大（請小於 3MB）', 'error');
+                return;
+            }
 
-            const reader = new FileReader();
-            reader.onload = () => {
-                const dataUrl = String(reader.result || '');
-                if (!dataUrl.startsWith('data:image/')) return;
+            setProfileStatus('profile-avatar-status', '上傳中…', 'muted');
+            try {
+                const toDataUrl = (blob) =>
+                    new Promise((resolve, reject) => {
+                        const fr = new FileReader();
+                        fr.onload = () => resolve(String(fr.result || ''));
+                        fr.onerror = () => reject(fr.error || new Error('read failed'));
+                        fr.readAsDataURL(blob);
+                    });
+
+                const bitmap = await createImageBitmap(file);
+                const side = Math.min(bitmap.width, bitmap.height);
+                const sx = Math.floor((bitmap.width - side) / 2);
+                const sy = Math.floor((bitmap.height - side) / 2);
+
+                const target = 256;
+                const canvas = document.createElement('canvas');
+                canvas.width = target;
+                canvas.height = target;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) throw new Error('canvas not supported');
+                ctx.drawImage(bitmap, sx, sy, side, side, 0, 0, target, target);
+                bitmap.close();
+
+                const tryQualities = [0.88, 0.8, 0.72, 0.65, 0.58];
+                let dataUrl = '';
+                for (const q of tryQualities) {
+                    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', q));
+                    if (!blob) continue;
+                    if (blob.size > 650 * 1024) continue;
+                    dataUrl = await toDataUrl(blob);
+                    if (dataUrl.startsWith('data:image/')) break;
+                }
+
+                if (!dataUrl) {
+                    setProfileStatus('profile-avatar-status', '圖片仍太大，請換一張較小的圖片', 'error');
+                    return;
+                }
+
+                setProfileStatus('profile-avatar-status', '儲存中…', 'muted');
+                await safeSetUserData(uid, { avatarDataUrl: dataUrl }, { merge: true });
+                if (currentUserData) currentUserData.avatarDataUrl = dataUrl;
+
                 try {
                     localStorage.setItem(`${PROFILE_AVATAR_KEY_PREFIX}${uid}`, dataUrl);
                 } catch {
                 }
+
                 applyProfileUI(auth.currentUser, currentUserData);
                 lucide.createIcons();
-            };
-            reader.readAsDataURL(file);
-            e.target.value = '';
+                setProfileStatus('profile-avatar-status', '已更新大頭照', 'success');
+            } catch (err) {
+                const code = err && err.code ? String(err.code) : '';
+                if (code.includes('permission-denied')) setProfileStatus('profile-avatar-status', '儲存失敗：沒有權限', 'error');
+                else setProfileStatus('profile-avatar-status', '儲存失敗，請稍後再試', 'error');
+            }
+        };
+
+        window.handleChangePassword = async () => {
+            setProfileStatus('profile-password-status', '', 'muted');
+            const user = auth.currentUser;
+            if (!user) {
+                setProfileStatus('profile-password-status', '尚未登入', 'error');
+                return;
+            }
+
+            const newEl = document.getElementById('pw-new');
+            const confirmEl = document.getElementById('pw-confirm');
+            const newPw = newEl ? String(newEl.value || '') : '';
+            const confirmPw = confirmEl ? String(confirmEl.value || '') : '';
+
+            if (!newPw || !confirmPw) {
+                setProfileStatus('profile-password-status', '請完整輸入所有欄位', 'error');
+                return;
+            }
+            if (newPw.length < 6) {
+                setProfileStatus('profile-password-status', '新密碼至少 6 碼', 'error');
+                return;
+            }
+            if (newPw !== confirmPw) {
+                setProfileStatus('profile-password-status', '新密碼與確認密碼不一致', 'error');
+                return;
+            }
+
+            setProfileStatus('profile-password-status', '處理中…', 'muted');
+            try {
+                await updatePassword(user, newPw);
+                if (newEl) newEl.value = '';
+                if (confirmEl) confirmEl.value = '';
+                setProfileStatus('profile-password-status', '密碼已更新', 'success');
+            } catch (err) {
+                const code = err && err.code ? String(err.code) : '';
+                if (code.includes('auth/too-many-requests')) {
+                    setProfileStatus('profile-password-status', '嘗試次數過多，請稍後再試', 'error');
+                } else if (code.includes('auth/requires-recent-login')) {
+                    setProfileStatus('profile-password-status', '需要重新登入後才能修改密碼', 'error');
+                } else {
+                    setProfileStatus('profile-password-status', '修改失敗，請稍後再試', 'error');
+                }
+            }
         };
 
         document.addEventListener('keydown', (e) => {
