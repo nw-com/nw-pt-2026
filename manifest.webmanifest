@@ -1,7 +1,7 @@
 {
   "name": "呼叫現金班 - 西北保全物業",
   "short_name": "呼叫現金班",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",

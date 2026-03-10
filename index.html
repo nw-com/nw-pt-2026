@@ -45,6 +45,12 @@
             <div class="w-16 h-16 border-4 border-red-100 border-t-red-600 rounded-full animate-spin"></div>
             <p class="mt-4 text-red-600 font-bold tracking-widest">系統啟動中</p>
         </div>
+        <div id="install-banner" class="hidden fixed left-1/2 -translate-x-1/2 bottom-4 w-[min(28rem,calc(100vw-2rem))] z-50">
+            <button id="install-app-btn" onclick="handleInstallApp()" class="w-full py-3 rounded-2xl bg-white text-[#333333] tracking-widest border border-gray-200 shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                <span class="text-sm font-black tracking-widest">安裝應用程式</span>
+            </button>
+        </div>
 
         <!-- 登入頁面 -->
         <div id="login-page" class="hidden flex-1 flex flex-col items-center px-8 pt-24 bg-white">
@@ -263,6 +269,37 @@
                 navigator.serviceWorker.register('./sw.js').catch(() => {});
             });
         }
+
+        let deferredInstallPrompt = null;
+
+        function setInstallAvailable(available) {
+            const banner = document.getElementById('install-banner');
+            if (!banner) return;
+            banner.classList.toggle('hidden', !available);
+        }
+
+        window.handleInstallApp = async () => {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            try {
+                await deferredInstallPrompt.userChoice;
+            } catch {
+            }
+            deferredInstallPrompt = null;
+            setInstallAvailable(false);
+        };
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            setInstallAvailable(true);
+            lucide.createIcons();
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredInstallPrompt = null;
+            setInstallAvailable(false);
+        });
 
         let currentUserData = null;
         let activeTab = 'ownerList';
