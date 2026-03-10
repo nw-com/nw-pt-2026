@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>呼叫現金班 - 西北保全物業</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#dc2626">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='48'%20fill='rgb(220%2C38%2C38)'/%3E%3Cg%20transform='translate(48%2C48)scale(4)'%20fill='none'%20stroke='white'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M20%2013c0%205-3.5%207.5-7.66%208.95a1%201%200%200%201-.67-.01C7.5%2020.5%204%2018%204%2013V6a1%201%200%200%201%201-1c2%200%204.5-1.2%206.24-2.72a1.17%201%200%200%201%201.52%200C14.51%203.81%2017%205%2019%205a1%201%200%200%201%201%201z'/%3E%3Cpath%20d='m9%2012%202%202%204-4'/%3E%3C/g%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='48'%20fill='rgb(220%2C38%2C38)'/%3E%3Cg%20transform='translate(48%2C48)scale(4)'%20fill='none'%20stroke='white'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M20%2013c0%205-3.5%207.5-7.66%208.95a1%201%200%200%201-.67-.01C7.5%2020.5%204%2018%204%2013V6a1%201%200%200%201%201-1c2%200%204.5-1.2%206.24-2.72a1.17%201%200%200%201%201.52%200C14.51%203.81%2017%205%2019%205a1%201%200%200%201%201%201z'/%3E%3Cpath%20d='m9%2012%202%202%204-4'/%3E%3C/g%3E%3C/svg%3E">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        .flat-card { border: 1px solid #f0f0f0; border-radius: 1rem; transition: all 0.2s; }
+        .flat-card:active { transform: scale(0.98); background-color: #f9f9f9; }
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+
+    <div id="app" class="min-h-screen flex flex-col max-w-md mx-auto relative shadow-2xl bg-gray-50">
+        <!-- 載入中狀態 -->
+        <div id="loading-screen" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center">
+            <div class="w-16 h-16 border-4 border-red-100 border-t-red-600 rounded-full animate-spin"></div>
+            <p class="mt-4 text-red-600 font-bold tracking-widest">系統啟動中</p>
+        </div>
+
+        <!-- 登入頁面 -->
+        <div id="login-page" class="hidden flex-1 flex flex-col items-center px-8 pt-24 bg-white">
+            <div class="w-20 h-20 bg-red-600 rounded-[2rem] flex items-center justify-center mb-8 shadow-2xl shadow-red-200">
+                <i data-lucide="shield-check" class="text-white w-12 h-12"></i>
+            </div>
+            <h1 class="text-3xl font-black text-gray-900 mb-2 tracking-tighter">呼叫現金班</h1>
+            <p class="text-gray-400 mb-12 font-medium">專業物業人力即時調度</p>
+            
+            <div class="w-full space-y-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-400 ml-2 uppercase">Email Address</label>
+                    <input id="email" type="email" placeholder="輸入電子郵件" class="w-full px-6 py-4 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-lg font-medium">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-400 ml-2 uppercase">Password</label>
+                    <div class="relative">
+                        <input id="password" type="password" placeholder="輸入密碼" class="w-full px-6 py-4 pr-14 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-lg font-medium">
+                        <button id="toggle-password" type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/60 border border-gray-200 flex items-center justify-center text-gray-500 active:scale-90 transition-transform">
+                            <i id="password-eye" data-lucide="eye" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between px-1">
+                    <label class="flex items-center gap-2 text-sm font-black text-gray-500 select-none">
+                        <input id="remember-me" type="checkbox" class="w-4 h-4 accent-red-600">
+                        記住我
+                    </label>
+                </div>
+                <p id="login-error" class="text-red-600 text-sm text-center hidden font-bold bg-red-50 py-2 rounded-lg"></p>
+                <button onclick="handleLogin()" class="w-full bg-red-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-red-200 active:scale-95 transition-transform text-xl mt-4">
+                    立即登入
+                </button>
+            </div>
+            
+            <div class="mt-auto pb-8 text-gray-500 text-[10px] tracking-widest font-black text-center">
+                © 2026 西北保全&物業. All rights reserved.
+            </div>
+        </div>
+
+        <!-- 主程式頁面 -->
+        <div id="main-page" class="hidden h-screen grid grid-rows-[40%_60%] overflow-hidden">
+            <header class="bg-red-600 text-white flex items-center justify-center relative">
+                <div class="hidden">
+                    <h2 id="display-role" class="text-lg font-black tracking-widest">載入權限...</h2>
+                    <p id="display-email" class="text-[10px] opacity-70 font-medium"></p>
+                </div>
+                <h1 class="text-xl font-black tracking-widest">呼叫現金班</h1>
+                <button onclick="handleLogout()" class="absolute right-4 p-2.5 bg-red-500 rounded-xl active:scale-90 transition-all border border-red-400">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </header>
+
+            <main id="content" class="hidden"></main>
+
+            <nav class="bg-[#333333] border-t border-black/10 flex justify-around items-center safe-bottom">
+                <button id="nav-map" class="flex flex-col items-center text-gray-300 group" onclick="setActiveTab('map')">
+                    <div class="p-1 group-active:scale-90 transition-transform"><i data-lucide="map-pinned" class="w-6 h-6"></i></div>
+                    <span class="text-[10px] font-black mt-1">地圖</span>
+                </button>
+                <button id="nav-list" class="flex flex-col items-center text-gray-300 group" onclick="setActiveTab('list')">
+                    <div class="p-1 group-active:scale-90 transition-transform"><i data-lucide="list-checks" class="w-6 h-6"></i></div>
+                    <span class="text-[10px] font-black mt-1">清單</span>
+                </button>
+                <button id="nav-history" class="flex flex-col items-center text-gray-300 group" onclick="setActiveTab('history')">
+                    <div class="p-1 group-active:scale-90 transition-transform"><i data-lucide="calendar-check-2" class="w-6 h-6"></i></div>
+                    <span class="text-[10px] font-black mt-1">歷史</span>
+                </button>
+                <button id="nav-settings" class="flex flex-col items-center text-gray-300 group" onclick="setActiveTab('settings')">
+                    <div class="p-1 group-active:scale-90 transition-transform"><i data-lucide="settings-2" class="w-6 h-6"></i></div>
+                    <span class="text-[10px] font-black mt-1">設定</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCY72ZAP2cJ4fCMrBK66TZ9X784ERljjJE",
+            authDomain: "nw-pt-2026.firebaseapp.com",
+            projectId: "nw-pt-2026",
+            storageBucket: "nw-pt-2026.firebasestorage.app",
+            messagingSenderId: "1017871862651",
+            appId: "1:1017871862651:web:d788ee68a3d66c62e1cbde",
+            measurementId: "G-44NK683DKY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'nw-pt-2026';
+        const ROLE_DEFS = {
+            '系統管理員': { level: 4, label: '系統管理員' },
+            '業主': { level: 3, label: '業主' },
+            '幹部': { level: 2, label: '幹部' },
+            '保全': { level: 1, label: '保全' }
+        };
+        const BOOTSTRAP_ADMIN_EMAIL = 'nwapp.eason@gmail.com';
+        const LOGIN_PREF_KEY = 'nw_login_pref_v1';
+
+        let currentUserData = null;
+        let activeTab = 'map';
+        let dbScope = 'artifacts';
+        let hasDbAccess = true;
+
+        function userDocRef(uid) {
+            return dbScope === 'root'
+                ? doc(db, 'users', uid)
+                : doc(db, 'artifacts', appId, 'users', uid);
+        }
+
+        function usersCollectionRef() {
+            return dbScope === 'root'
+                ? collection(db, 'users')
+                : collection(db, 'artifacts', appId, 'users');
+        }
+
+        function attendanceCollectionRef() {
+            return dbScope === 'root'
+                ? collection(db, 'attendance')
+                : collection(db, 'artifacts', appId, 'attendance');
+        }
+
+        async function withDbFallback(fn) {
+            try {
+                return await fn();
+            } catch (e) {
+                if (e && e.code === 'permission-denied' && dbScope === 'artifacts') {
+                    dbScope = 'root';
+                    return await fn();
+                }
+                throw e;
+            }
+        }
+
+        function showDbAccessError() {
+            const errorEl = document.getElementById('login-error');
+            if (errorEl) {
+                errorEl.innerText = "資料庫存取權限不足（請確認 Firestore Rules 與資料路徑），目前以有限模式進入";
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        async function safeGetUserData(user) {
+            try {
+                const userDoc = await withDbFallback(() => getDoc(userDocRef(user.uid)));
+                return userDoc.exists() ? userDoc.data() : null;
+            } catch (e) {
+                if (e && e.code === 'permission-denied') {
+                    hasDbAccess = false;
+                    return null;
+                }
+                throw e;
+            }
+        }
+
+        async function safeSetUserData(uid, data, options = { merge: true }) {
+            try {
+                await withDbFallback(() => setDoc(userDocRef(uid), data, options));
+                return true;
+            } catch (e) {
+                if (e && e.code === 'permission-denied') {
+                    hasDbAccess = false;
+                    return false;
+                }
+                throw e;
+            }
+        }
+
+        async function safeAddAttendance(data) {
+            try {
+                await withDbFallback(() => addDoc(attendanceCollectionRef(), data));
+                return true;
+            } catch (e) {
+                if (e && e.code === 'permission-denied') {
+                    hasDbAccess = false;
+                    return false;
+                }
+                throw e;
+            }
+        }
+
+        window.handleLogin = async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('login-error');
+            const rememberMe = Boolean(document.getElementById('remember-me')?.checked);
+            if (!email || !password) {
+                errorEl.innerText = "請輸入 Email 與密碼";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            try {
+                errorEl.classList.add('hidden');
+                await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+                if (rememberMe) {
+                    localStorage.setItem(LOGIN_PREF_KEY, JSON.stringify({ rememberMe: true, email }));
+                } else {
+                    localStorage.setItem(LOGIN_PREF_KEY, JSON.stringify({ rememberMe: false }));
+                }
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                errorEl.innerText = "驗證失敗，請檢查帳密";
+                errorEl.classList.remove('hidden');
+            }
+        };
+
+        window.handleLogout = () => signOut(auth).then(() => location.reload());
+
+        // 核心修正：所有的 Firestore 操作都必須在 onAuthStateChanged 內部且 user 存在時執行
+        onAuthStateChanged(auth, async (user) => {
+            const loadingScreen = document.getElementById('loading-screen');
+            const loginPage = document.getElementById('login-page');
+            const mainPage = document.getElementById('main-page');
+
+            if (user) {
+                try {
+                    let userData = await safeGetUserData(user);
+                    
+                    if (!userData) {
+                        userData = { 
+                            role: '保全', 
+                            level: 1,
+                            email: user.email, 
+                            uid: user.uid, 
+                            disabled: false,
+                            hidden: false,
+                            createdAt: new Date().toISOString() 
+                        };
+                        await safeSetUserData(user.uid, userData, { merge: true });
+                    }
+
+                    userData = normalizeUserData(userData, user);
+                    if ((user.email || '').toLowerCase() === BOOTSTRAP_ADMIN_EMAIL) {
+                        if (userData.role !== '系統管理員' || userData.level !== 4) {
+                            const ok = await safeSetUserData(user.uid, {
+                                role: '系統管理員',
+                                level: 4,
+                                disabled: false,
+                                email: user.email,
+                                uid: user.uid,
+                                updatedAt: new Date().toISOString()
+                            }, { merge: true });
+                            if (ok) {
+                                userData = { ...userData, role: '系統管理員', level: 4, disabled: false };
+                            }
+                        }
+                    }
+                    if (userData.disabled) {
+                        document.getElementById('login-error').innerText = "此帳號已停用，請聯繫管理員";
+                        document.getElementById('login-error').classList.remove('hidden');
+                        await signOut(auth);
+                        loadingScreen.classList.add('hidden');
+                        return;
+                    }
+
+                    currentUserData = userData;
+                    document.getElementById('display-role').innerText = userData.role;
+                    document.getElementById('display-email').innerText = userData.email;
+                    setActiveTab('map');
+                    loginPage.classList.add('hidden');
+                    mainPage.classList.remove('hidden');
+
+                    if (!hasDbAccess) {
+                        showDbAccessError();
+                    }
+                } catch (e) {
+                    console.error("Firestore Access Error:", e);
+                    if (e.code === 'permission-denied') {
+                        hasDbAccess = false;
+                        currentUserData = normalizeUserData({
+                            role: '保全',
+                            level: 1,
+                            email: user.email,
+                            uid: user.uid,
+                            disabled: false,
+                            hidden: false
+                        }, user);
+                        document.getElementById('display-role').innerText = currentUserData.role;
+                        document.getElementById('display-email').innerText = currentUserData.email;
+                        setActiveTab('map');
+                        loginPage.classList.add('hidden');
+                        mainPage.classList.remove('hidden');
+                        showDbAccessError();
+                    }
+                }
+            } else {
+                initLoginPreferences();
+                loginPage.classList.remove('hidden');
+                mainPage.classList.add('hidden');
+            }
+            loadingScreen.classList.add('hidden');
+            lucide.createIcons();
+        });
+
+        window.togglePasswordVisibility = () => {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('password-eye');
+            if (!input || !icon) return;
+            const nextType = input.type === 'password' ? 'text' : 'password';
+            input.type = nextType;
+            icon.setAttribute('data-lucide', nextType === 'password' ? 'eye' : 'eye-off');
+            lucide.createIcons();
+        };
+
+        function initLoginPreferences() {
+            const emailEl = document.getElementById('email');
+            const rememberEl = document.getElementById('remember-me');
+            if (!emailEl || !rememberEl) return;
+
+            try {
+                const raw = localStorage.getItem(LOGIN_PREF_KEY);
+                if (!raw) return;
+                const pref = JSON.parse(raw);
+                const rememberMe = Boolean(pref && pref.rememberMe);
+                rememberEl.checked = rememberMe;
+                if (rememberMe && pref && typeof pref.email === 'string') {
+                    emailEl.value = pref.email;
+                }
+            } catch (e) {
+            }
+        }
+
+        window.setActiveTab = (tab) => {
+            activeTab = tab;
+            renderActiveTab();
+        };
+
+        function normalizeUserData(userData, user) {
+            const role = (userData && userData.role && ROLE_DEFS[userData.role]) ? userData.role : '保全';
+            const level = (userData && typeof userData.level === 'number') ? userData.level : ROLE_DEFS[role].level;
+            const email = userData && userData.email ? userData.email : user.email;
+            const uid = userData && userData.uid ? userData.uid : user.uid;
+            const disabled = Boolean(userData && userData.disabled);
+            const hidden = Boolean(userData && userData.hidden);
+            const name = userData && userData.name ? userData.name : '';
+            return { ...userData, role, level, email, uid, disabled, hidden, name };
+        }
+
+        function updateNavUI() {
+            const tabs = ['map', 'list', 'history', 'settings'];
+            for (const tab of tabs) {
+                const el = document.getElementById(`nav-${tab}`);
+                if (!el) continue;
+                if (tab === activeTab) {
+                    el.classList.remove('text-gray-300');
+                    el.classList.add('text-red-600');
+                } else {
+                    el.classList.add('text-gray-300');
+                    el.classList.remove('text-red-600');
+                }
+            }
+        }
+
+        async function renderActiveTab() {
+            if (!currentUserData) return;
+            updateNavUI();
+            const content = document.getElementById('content');
+            content.innerHTML = '';
+
+            if (activeTab === 'map') {
+                renderMapTab(content, currentUserData);
+            } else if (activeTab === 'list') {
+                await renderListTab(content, currentUserData);
+            } else if (activeTab === 'history') {
+                await renderHistoryTab(content, currentUserData);
+            } else if (activeTab === 'settings') {
+                renderSettingsTab(content, currentUserData);
+            }
+
+            lucide.createIcons();
+        }
+
+        function renderTopCard(title, subtitle) {
+            const badge = hasDbAccess
+                ? `LEVEL ${ROLE_DEFS[currentUserData.role].level}`
+                : `有限模式`;
+            return `
+                <div class="bg-red-600 p-5 rounded-[2rem] text-white shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold opacity-80 uppercase text-[10px]">${subtitle}</h4>
+                        <span class="bg-red-500 px-2 py-1 rounded text-[10px] font-black">${badge}</span>
+                    </div>
+                    <p class="text-3xl font-black tracking-tighter">${title}</p>
+                </div>
+            `;
+        }
+
+        function renderMapTab(container, userData) {
+            if (userData.role === '保全') {
+                container.innerHTML = `
+                    ${renderTopCard('搵工地圖', 'SECURITY')}
+                    <div class="flat-card bg-white p-5 border-none shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-black text-gray-800">我的定位</h4>
+                                <p id="geo-status" class="text-xs text-gray-400 font-medium mt-1">尚未取得定位</p>
+                            </div>
+                            <button onclick="getMyLocation()" class="bg-red-600 text-white font-black px-4 py-3 rounded-2xl active:scale-95 transition-transform">
+                                取得定位
+                            </button>
+                        </div>
+                        <div class="mt-4 grid grid-cols-2 gap-3">
+                            <div class="bg-gray-50 rounded-2xl p-4">
+                                <p class="text-[10px] text-gray-400 font-black uppercase">Latitude</p>
+                                <p id="geo-lat" class="text-lg font-black text-gray-800">--</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-2xl p-4">
+                                <p class="text-[10px] text-gray-400 font-black uppercase">Longitude</p>
+                                <p id="geo-lng" class="text-lg font-black text-gray-800">--</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flat-card bg-white p-5 border-none shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-black text-gray-800">隱私模式</h4>
+                                <p class="text-xs text-gray-400 font-medium mt-1">在地圖上隱藏我的位置</p>
+                            </div>
+                            <button id="hidden-toggle" onclick="toggleHidden()" class="px-4 py-3 rounded-2xl font-black ${userData.hidden ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600'} active:scale-95 transition-transform">
+                                ${userData.hidden ? '已開啟' : '已關閉'}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flat-card bg-white p-5 border-none shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-black text-gray-800">GPS 打卡</h4>
+                                <p id="punch-status" class="text-xs text-gray-400 font-medium mt-1">${userData.shiftStatus === 'in' ? '上班中' : '未上班'}</p>
+                            </div>
+                            <button onclick="togglePunch()" class="bg-red-600 text-white font-black px-4 py-3 rounded-2xl active:scale-95 transition-transform">
+                                ${userData.shiftStatus === 'in' ? '下班打卡' : '上班打卡'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (userData.role === '系統管理員') {
+                container.innerHTML = `
+                    ${renderTopCard('系統總覽', 'ADMIN')}
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <i data-lucide="bar-chart-3" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                        <p class="text-gray-400 font-bold tracking-tight">系統統計模組預留</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    ${renderTopCard('調度戰情室', userData.role === '業主' ? 'OWNER' : 'OFFICER')}
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <i data-lucide="map" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                        <p class="text-gray-400 font-bold tracking-tight">案場地圖模組預留</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function renderListTab(container, userData) {
+            if (userData.role === '系統管理員') {
+                container.innerHTML = `
+                    ${renderTopCard('用戶管理', 'ADMIN')}
+                    <div class="flat-card bg-white p-5 border-none shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-red-50 rounded-2xl flex items-center justify-center text-red-600"><i data-lucide="search"></i></div>
+                            <input id="admin-user-search" placeholder="搜尋 Email / UID" class="flex-1 px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                        </div>
+                        <button onclick="loadAdminUsers()" class="w-full mt-4 bg-red-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-red-200 active:scale-95 transition-transform">
+                            重新載入用戶
+                        </button>
+                    </div>
+                    <div id="admin-users" class="space-y-3"></div>
+                `;
+                await loadAdminUsers();
+                return;
+            }
+
+            if (userData.role === '保全') {
+                container.innerHTML = `
+                    ${renderTopCard('職缺清單', 'SECURITY')}
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <i data-lucide="briefcase" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                        <p class="text-gray-400 font-bold tracking-tight">職缺資料節點（Sites / Jobs）尚未建立</p>
+                    </div>
+                    <div class="flat-card bg-white p-5 border-none shadow-sm">
+                        <h4 class="font-black text-gray-800 mb-2">快速聯繫</h4>
+                        <div class="grid grid-cols-2 gap-3">
+                            <a class="bg-gray-100 text-gray-700 font-black py-4 rounded-2xl text-center active:scale-95 transition-transform" href="tel:+886900000000">撥打電話</a>
+                            <a class="bg-red-600 text-white font-black py-4 rounded-2xl text-center active:scale-95 transition-transform" href="https://line.me/R/ti/p/@example" target="_blank" rel="noreferrer">Line 聯繫</a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                ${renderTopCard('案場 / 職缺', userData.role === '業主' ? 'OWNER' : 'OFFICER')}
+                <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                    <i data-lucide="layers" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                    <p class="text-gray-400 font-bold tracking-tight">案場（Sites）與職缺（Jobs）模組預留</p>
+                </div>
+            `;
+        }
+
+        async function renderHistoryTab(container, userData) {
+            if (userData.role === '保全') {
+                container.innerHTML = `
+                    ${renderTopCard('打卡紀錄', 'SECURITY')}
+                    <div id="attendance-list" class="space-y-3"></div>
+                `;
+                await loadAttendanceHistory(userData.uid);
+                return;
+            }
+
+            container.innerHTML = `
+                ${renderTopCard('操作紀錄', userData.role === '系統管理員' ? 'ADMIN' : (userData.role === '業主' ? 'OWNER' : 'OFFICER'))}
+                <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                    <i data-lucide="history" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                    <p class="text-gray-400 font-bold tracking-tight">紀錄模組預留</p>
+                </div>
+            `;
+        }
+
+        function renderSettingsTab(container, userData) {
+            container.innerHTML = `
+                ${renderTopCard('個人設定', 'PROFILE')}
+                <div class="flat-card bg-white p-5 border-none shadow-sm">
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-gray-400 ml-2 uppercase">Display Name</label>
+                        <input id="profile-name" value="${escapeHtml(userData.name || '')}" placeholder="輸入顯示名稱" class="w-full px-6 py-4 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-lg font-medium">
+                    </div>
+                    <button onclick="saveProfile()" class="w-full mt-4 bg-red-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-red-200 active:scale-95 transition-transform">
+                        儲存
+                    </button>
+                </div>
+                <div class="p-6 text-center text-gray-500 text-[10px] tracking-widest font-black">
+                    © 2026 西北保全&物業. All rights reserved.
+                </div>
+            `;
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        window.getMyLocation = async () => {
+            const statusEl = document.getElementById('geo-status');
+            const latEl = document.getElementById('geo-lat');
+            const lngEl = document.getElementById('geo-lng');
+            if (!navigator.geolocation) {
+                if (statusEl) statusEl.innerText = "此瀏覽器不支援定位";
+                return;
+            }
+
+            if (statusEl) statusEl.innerText = "定位中...";
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    if (statusEl) statusEl.innerText = "定位成功";
+                    if (latEl) latEl.innerText = lat.toFixed(6);
+                    if (lngEl) lngEl.innerText = lng.toFixed(6);
+                    currentUserData = { ...currentUserData, lastLat: lat, lastLng: lng, lastGeoAt: new Date().toISOString() };
+                    const ok = await safeSetUserData(currentUserData.uid, {
+                        lastLat: lat,
+                        lastLng: lng,
+                        lastGeoAt: new Date().toISOString()
+                    }, { merge: true });
+                    if (!ok) alert("資料庫存取權限不足，無法儲存定位");
+                },
+                (err) => {
+                    if (statusEl) statusEl.innerText = err && err.message ? err.message : "定位失敗";
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+            );
+        };
+
+        window.toggleHidden = async () => {
+            if (!currentUserData) return;
+            const nextHidden = !currentUserData.hidden;
+            currentUserData = { ...currentUserData, hidden: nextHidden, updatedAt: new Date().toISOString() };
+            const ok = await safeSetUserData(currentUserData.uid, {
+                hidden: nextHidden,
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
+            if (!ok) alert("資料庫存取權限不足，無法更新隱私設定");
+            renderActiveTab();
+        };
+
+        window.togglePunch = async () => {
+            if (!currentUserData) return;
+            const nextStatus = currentUserData.shiftStatus === 'in' ? 'out' : 'in';
+            const punchType = nextStatus === 'in' ? 'clock_in' : 'clock_out';
+            let lat = currentUserData.lastLat;
+            let lng = currentUserData.lastLng;
+
+            if (typeof lat !== 'number' || typeof lng !== 'number') {
+                await new Promise((resolve) => {
+                    if (!navigator.geolocation) return resolve();
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            lat = pos.coords.latitude;
+                            lng = pos.coords.longitude;
+                            resolve();
+                        },
+                        () => resolve(),
+                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                    );
+                });
+            }
+
+            const attendanceOk = await safeAddAttendance({
+                uid: currentUserData.uid,
+                email: currentUserData.email,
+                type: punchType,
+                lat: typeof lat === 'number' ? lat : null,
+                lng: typeof lng === 'number' ? lng : null,
+                createdAt: new Date().toISOString()
+            });
+
+            currentUserData = { ...currentUserData, shiftStatus: nextStatus, updatedAt: new Date().toISOString() };
+            const userOk = await safeSetUserData(currentUserData.uid, {
+                shiftStatus: nextStatus,
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
+            if (!attendanceOk || !userOk) alert("資料庫存取權限不足，無法完成打卡");
+
+            renderActiveTab();
+        };
+
+        window.saveProfile = async () => {
+            if (!currentUserData) return;
+            const name = (document.getElementById('profile-name')?.value || '').trim();
+            currentUserData = { ...currentUserData, name, updatedAt: new Date().toISOString() };
+            const ok = await safeSetUserData(currentUserData.uid, {
+                name,
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
+            if (!ok) alert("資料庫存取權限不足，無法儲存個人資料");
+            renderActiveTab();
+        };
+
+        window.loadAdminUsers = async () => {
+            if (!currentUserData || currentUserData.role !== '系統管理員') return;
+            const listEl = document.getElementById('admin-users');
+            if (!listEl) return;
+            listEl.innerHTML = `
+                <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                    <div class="w-12 h-12 border-4 border-red-100 border-t-red-600 rounded-full animate-spin mx-auto"></div>
+                    <p class="mt-4 text-gray-400 font-bold tracking-tight">載入中...</p>
+                </div>
+            `;
+
+            let users = [];
+            try {
+                const q = query(usersCollectionRef(), orderBy('email'), limit(200));
+                const snap = await withDbFallback(() => getDocs(q));
+                users = snap.docs.map((d) => d.data());
+            } catch (e) {
+                if (e && e.code === 'permission-denied') {
+                    hasDbAccess = false;
+                    listEl.innerHTML = `
+                        <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                            <i data-lucide="shield-alert" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                            <p class="text-gray-400 font-bold tracking-tight">資料庫存取權限不足，無法載入用戶清單</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+                throw e;
+            }
+            const search = (document.getElementById('admin-user-search')?.value || '').trim().toLowerCase();
+            const filtered = search
+                ? users.filter((u) => String(u.email || '').toLowerCase().includes(search) || String(u.uid || '').toLowerCase().includes(search))
+                : users;
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <i data-lucide="user-x" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                        <p class="text-gray-400 font-bold tracking-tight">找不到用戶</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            listEl.innerHTML = filtered.map((u) => {
+                const role = (u && u.role && ROLE_DEFS[u.role]) ? u.role : '保全';
+                const disabled = Boolean(u && u.disabled);
+                const uid = escapeHtml(u.uid || '');
+                const email = escapeHtml(u.email || '(no email)');
+                return `
+                    <div class="flat-card bg-white p-5 border-none shadow-sm">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex-1 min-w-0">
+                                <p class="font-black text-gray-800 truncate">${email}</p>
+                                <p class="text-[10px] text-gray-300 font-bold tracking-widest mt-1 truncate">${uid}</p>
+                                <div class="mt-3 flex items-center gap-2">
+                                    <span class="text-xs font-black ${disabled ? 'text-red-600' : 'text-gray-400'}">${disabled ? '已停用' : '啟用中'}</span>
+                                    <span class="text-xs font-black text-gray-300">•</span>
+                                    <span class="text-xs font-black text-gray-400">${escapeHtml(role)}</span>
+                                </div>
+                            </div>
+                            <div class="w-28">
+                                <select id="role-${uid}" class="w-full px-3 py-3 bg-gray-100 rounded-2xl text-xs font-black text-gray-700 border-none focus:ring-2 focus:ring-red-500">
+                                    ${Object.keys(ROLE_DEFS).map((r) => `<option value="${escapeHtml(r)}" ${r === role ? 'selected' : ''}>${escapeHtml(r)}</option>`).join('')}
+                                </select>
+                                <button onclick="updateUserRole('${uid}')" class="w-full mt-2 bg-red-600 text-white font-black py-3 rounded-2xl text-xs active:scale-95 transition-transform">
+                                    套用
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        };
+
+        window.updateUserRole = async (uid) => {
+            if (!currentUserData || currentUserData.role !== '系統管理員') return;
+            const selectEl = document.getElementById(`role-${uid}`);
+            if (!selectEl) return;
+            const role = selectEl.value;
+            const level = ROLE_DEFS[role]?.level ?? 1;
+            const ok = await safeSetUserData(uid, {
+                role,
+                level,
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
+            if (!ok) alert("資料庫存取權限不足，無法更新角色");
+            await loadAdminUsers();
+        };
+
+        async function loadAttendanceHistory(uid) {
+            const listEl = document.getElementById('attendance-list');
+            if (!listEl) return;
+
+            let rows = [];
+            try {
+                const q = query(attendanceCollectionRef(), where('uid', '==', uid), orderBy('createdAt', 'desc'), limit(20));
+                const snap = await withDbFallback(() => getDocs(q));
+                rows = snap.docs.map((d) => d.data());
+            } catch (e) {
+                if (e && e.code === 'permission-denied') {
+                    hasDbAccess = false;
+                    listEl.innerHTML = `
+                        <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                            <i data-lucide="shield-alert" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                            <p class="text-gray-400 font-bold tracking-tight">資料庫存取權限不足，無法載入打卡紀錄</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+                throw e;
+            }
+
+            if (rows.length === 0) {
+                listEl.innerHTML = `
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <i data-lucide="calendar-x" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                        <p class="text-gray-400 font-bold tracking-tight">尚無打卡紀錄</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            listEl.innerHTML = rows.map((r) => {
+                const typeLabel = r.type === 'clock_in' ? '上班' : (r.type === 'clock_out' ? '下班' : '打卡');
+                const createdAt = escapeHtml(r.createdAt || '');
+                const lat = typeof r.lat === 'number' ? r.lat.toFixed(5) : '--';
+                const lng = typeof r.lng === 'number' ? r.lng.toFixed(5) : '--';
+                return `
+                    <div class="flat-card bg-white p-5 border-none shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-black text-gray-800">${typeLabel}打卡</p>
+                                <p class="text-xs text-gray-400 font-bold mt-1">${createdAt}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] text-gray-300 font-black tracking-widest">LAT ${lat}</p>
+                                <p class="text-[10px] text-gray-300 font-black tracking-widest mt-1">LNG ${lng}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

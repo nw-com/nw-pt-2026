@@ -1,0 +1,114 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function bootstrapAdminEmail() {
+      return 'nwapp.eason@gmail.com';
+    }
+
+    function isBootstrapAdmin() {
+      return signedIn() && request.auth.token.email == bootstrapAdminEmail();
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function userDocArtifact(appId, uid) {
+      return /databases/$(database)/documents/artifacts/$(appId)/users/$(uid);
+    }
+
+    function userDocRoot(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    function isAdminArtifact(appId) {
+      return signedIn()
+        && (
+          request.auth.token.admin == true
+          || (request.auth.token.level != null && request.auth.token.level >= 4)
+          || get(userDocArtifact(appId, request.auth.uid)).data.role == '系統管理員'
+        );
+    }
+
+    function isAdminRoot() {
+      return signedIn()
+        && (
+          request.auth.token.admin == true
+          || (request.auth.token.level != null && request.auth.token.level >= 4)
+          || get(userDocRoot(request.auth.uid)).data.role == '系統管理員'
+        );
+    }
+
+    function selfUserUpdateAllowed(isAdmin) {
+      return isAdmin
+        || (
+          isBootstrapAdmin()
+          && request.resource.data.role == '系統管理員'
+          && request.resource.data.level == 4
+        )
+        || (
+          !request.resource.data
+            .diff(resource.data)
+            .changedKeys()
+            .hasAny(['role', 'level', 'disabled', 'uid', 'email'])
+        );
+    }
+
+    match /artifacts/{appId}/users/{uid} {
+      allow read: if isSelf(uid) || isAdminArtifact(appId);
+      allow create: if isAdminArtifact(appId)
+        || (
+          isSelf(uid)
+          && (
+            isBootstrapAdmin()
+            || (
+              request.resource.data.role == '保全'
+              && request.resource.data.level == 1
+              && request.resource.data.disabled == false
+            )
+          )
+        );
+      allow update: if isSelf(uid) && selfUserUpdateAllowed(isAdminArtifact(appId));
+      allow delete: if isAdminArtifact(appId);
+    }
+
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isAdminRoot();
+      allow create: if isAdminRoot()
+        || (
+          isSelf(uid)
+          && (
+            isBootstrapAdmin()
+            || (
+              request.resource.data.role == '保全'
+              && request.resource.data.level == 1
+              && request.resource.data.disabled == false
+            )
+          )
+        );
+      allow update: if isSelf(uid) && selfUserUpdateAllowed(isAdminRoot());
+      allow delete: if isAdminRoot();
+    }
+
+    match /artifacts/{appId}/attendance/{docId} {
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdminArtifact(appId));
+      allow update, delete: if false;
+    }
+
+    match /attendance/{docId} {
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdminRoot());
+      allow update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
