@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>呼叫現金班 - 西北保全物業</title>
+    <title>呼叫現金班</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -154,9 +154,9 @@
                     <div class="nav-icon"><i data-lucide="building-2" class="w-6 h-6"></i></div>
                     <span class="nav-label">業主設定</span>
                 </button>
-                <button id="nav-officerSettings" class="nav-tile" onclick="setActiveTab('officerSettings')">
-                    <div class="nav-icon"><i data-lucide="briefcase" class="w-6 h-6"></i></div>
-                    <span class="nav-label">幹部設定</span>
+                <button id="nav-officerSettings" class="nav-tile" onclick="openAccountSettings()">
+                    <div class="nav-icon"><i data-lucide="users" class="w-6 h-6"></i></div>
+                    <span class="nav-label">帳號設定</span>
                 </button>
                 <button id="nav-guardSettings" class="nav-tile" onclick="setActiveTab('guardSettings')">
                     <div class="nav-icon"><i data-lucide="shield" class="w-6 h-6"></i></div>
@@ -182,10 +182,13 @@
                                 <img id="profile-modal-avatar" class="w-full h-full object-cover hidden rounded-full" alt="大頭照">
                                 <i id="profile-modal-avatar-fallback" data-lucide="user" class="w-7 h-7 text-gray-500"></i>
                             </button>
-                            <div class="min-w-0">
+                            <div class="min-w-0 flex-1">
                                 <div id="profile-info-name" class="text-gray-900 text-lg tracking-widest truncate">-</div>
                                 <div id="profile-info-role" class="text-gray-500 text-sm tracking-widest truncate">-</div>
                             </div>
+                            <button onclick="openPhoneQrModal()" class="w-10 h-10 rounded-xl bg-gray-50 text-gray-600 active:scale-90 transition-all flex items-center justify-center border border-gray-200">
+                                <i data-lucide="qr-code" class="w-5 h-5"></i>
+                            </button>
                         </div>
                         <div id="profile-avatar-status" class="mt-3 text-xs tracking-widest text-gray-500 hidden"></div>
                         <div class="mt-6 grid grid-cols-1 gap-3">
@@ -230,6 +233,57 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div id="phone-qr-modal" class="hidden fixed inset-0 z-[60]">
+            <div class="absolute inset-0 bg-black/60" onclick="closePhoneQrModal()"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-6">
+                <div class="w-[min(22rem,90vw)] bg-white rounded-3xl overflow-hidden shadow-2xl">
+                    <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
+                        <div class="text-[#333333] text-base tracking-widest">QR Code</div>
+                        <button onclick="closePhoneQrModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
+                            <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div id="phone-qr-name" class="text-gray-900 text-lg tracking-widest text-center truncate">-</div>
+                        <div id="phone-qr-number" class="mt-1 text-[#333333] text-sm tracking-widest text-center break-all">-</div>
+                        <div class="mt-4 flex items-center justify-center">
+                            <img id="phone-qr-img" class="w-56 h-56 rounded-2xl border border-gray-200 bg-white" alt="QR Code">
+                        </div>
+                        <div id="phone-qr-hint" class="mt-3 text-xs tracking-widest text-gray-500 text-center hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="accounts-modal" class="hidden fixed inset-0 z-[70]">
+            <div class="absolute inset-0 bg-white flex flex-col">
+                <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
+                    <div class="text-[#333333] text-base tracking-widest">帳號設定</div>
+                    <button onclick="closeAccountsModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
+                        <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
+                    </button>
+                </div>
+                <div class="px-4 pt-3 pb-2 bg-white">
+                    <div class="grid grid-cols-4 gap-2">
+                        <button id="accounts-tab-guard" onclick="setAccountsRoleFilter('保全')" class="py-3 rounded-2xl bg-red-600 text-white tracking-widest active:scale-95 transition-all">保全</button>
+                        <button id="accounts-tab-officer" onclick="setAccountsRoleFilter('幹部')" class="py-3 rounded-2xl bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">幹部</button>
+                        <button id="accounts-tab-owner" onclick="setAccountsRoleFilter('業主')" class="py-3 rounded-2xl bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">業主</button>
+                        <button id="accounts-tab-admin" onclick="setAccountsRoleFilter('系統管理員')" class="py-3 rounded-2xl bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">系統管理員</button>
+                    </div>
+                </div>
+                <div class="p-4 bg-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-yellow-400 rounded-2xl flex items-center justify-center text-[#333333] border border-yellow-500">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                        </div>
+                        <input id="accounts-search" placeholder="搜尋 姓名 / Email / UID / 手機" class="flex-1 px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold" oninput="loadAccountsList()">
+                    </div>
+                    <button onclick="loadAccountsList(true)" class="w-full mt-4 bg-red-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-red-200 active:scale-95 transition-transform">
+                        重新載入帳號
+                    </button>
+                </div>
+                <div id="accounts-list" class="flex-1 overflow-auto p-4 space-y-3 bg-gray-50"></div>
             </div>
         </div>
     </div>
@@ -300,6 +354,51 @@
             deferredInstallPrompt = null;
             setInstallAvailable(false);
         });
+
+        function sanitizePhoneForQr(phoneRaw) {
+            const raw = phoneRaw == null ? '' : String(phoneRaw);
+            const trimmed = raw.trim();
+            if (!trimmed || trimmed === '-') return '';
+            const safe = trimmed.replace(/[^\d+]/g, '');
+            return safe;
+        }
+
+        window.openPhoneQrModal = () => {
+            const modal = document.getElementById('phone-qr-modal');
+            const nameEl = document.getElementById('phone-qr-name');
+            const numberEl = document.getElementById('phone-qr-number');
+            const imgEl = document.getElementById('phone-qr-img');
+            const hintEl = document.getElementById('phone-qr-hint');
+            if (!modal || !nameEl || !numberEl || !imgEl || !hintEl) return;
+
+            const nameFromUi = document.getElementById('profile-info-name');
+            nameEl.textContent = nameFromUi ? String(nameFromUi.textContent || '-').trim() || '-' : '-';
+
+            const phoneFromUi = document.getElementById('profile-info-phone');
+            const phone = sanitizePhoneForQr(phoneFromUi ? phoneFromUi.textContent : '');
+            if (!phone) {
+                numberEl.textContent = '尚未設定手機號碼';
+                imgEl.classList.add('hidden');
+                hintEl.textContent = '請先在使用者資料中設定手機號碼';
+                hintEl.classList.remove('hidden');
+            } else {
+                numberEl.textContent = phone;
+                imgEl.classList.remove('hidden');
+                hintEl.classList.add('hidden');
+                const url = `https://quickchart.io/qr?text=${encodeURIComponent(phone)}&size=320&margin=2`;
+                imgEl.src = url;
+            }
+
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closePhoneQrModal = () => {
+            const modal = document.getElementById('phone-qr-modal');
+            const imgEl = document.getElementById('phone-qr-img');
+            if (imgEl) imgEl.removeAttribute('src');
+            if (modal) modal.classList.add('hidden');
+        };
 
         let currentUserData = null;
         let activeTab = 'ownerList';
@@ -476,6 +575,136 @@
             const modal = document.getElementById('profile-modal');
             if (!modal) return;
             modal.classList.add('hidden');
+        };
+
+        let accountsCache = null;
+        let accountsRoleFilter = '保全';
+
+        function updateAccountsTabsUI() {
+            const defs = [
+                { id: 'accounts-tab-guard', role: '保全' },
+                { id: 'accounts-tab-officer', role: '幹部' },
+                { id: 'accounts-tab-owner', role: '業主' },
+                { id: 'accounts-tab-admin', role: '系統管理員' }
+            ];
+            defs.forEach(({ id, role }) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const active = accountsRoleFilter === role;
+                el.classList.toggle('bg-red-600', active);
+                el.classList.toggle('text-white', active);
+                el.classList.toggle('bg-gray-100', !active);
+                el.classList.toggle('text-gray-600', !active);
+            });
+        }
+
+        window.setAccountsRoleFilter = async (role) => {
+            accountsRoleFilter = role;
+            updateAccountsTabsUI();
+            await loadAccountsList(false);
+        };
+
+        window.openAccountSettings = async () => {
+            const modal = document.getElementById('accounts-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+            updateAccountsTabsUI();
+            await loadAccountsList(true);
+        };
+
+        window.closeAccountsModal = () => {
+            const modal = document.getElementById('accounts-modal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+        };
+
+        window.loadAccountsList = async (forceReload = false) => {
+            const listEl = document.getElementById('accounts-list');
+            if (!listEl) return;
+
+            if (forceReload || !Array.isArray(accountsCache)) {
+                listEl.innerHTML = `
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <div class="w-12 h-12 border-4 border-red-100 border-t-red-600 rounded-full animate-spin mx-auto"></div>
+                        <p class="mt-4 text-gray-400 font-bold tracking-tight">載入中...</p>
+                    </div>
+                `;
+                try {
+                    const q = query(usersCollectionRef(), orderBy('email'), limit(500));
+                    const snap = await withDbFallback(() => getDocs(q));
+                    accountsCache = snap.docs.map((d) => d.data());
+                } catch (e) {
+                    if (e && e.code === 'permission-denied') {
+                        hasDbAccess = false;
+                        listEl.innerHTML = `
+                            <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                                <i data-lucide="shield-alert" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                                <p class="text-gray-400 font-bold tracking-tight">資料庫存取權限不足，無法載入帳號清單</p>
+                            </div>
+                        `;
+                        lucide.createIcons();
+                        return;
+                    }
+                    throw e;
+                }
+            }
+
+            const search = (document.getElementById('accounts-search')?.value || '').trim().toLowerCase();
+            const users = Array.isArray(accountsCache) ? accountsCache : [];
+            const filteredBySearch = search
+                ? users.filter((u) => {
+                    const email = String(u?.email || '').toLowerCase();
+                    const uid = String(u?.uid || '').toLowerCase();
+                    const name = String(u?.name || '').toLowerCase();
+                    const phone = String(u?.phone || '').toLowerCase();
+                    return email.includes(search) || uid.includes(search) || name.includes(search) || phone.includes(search);
+                })
+                : users;
+            const filtered = filteredBySearch.filter((u) => {
+                const role = (u && u.role && ROLE_DEFS[u.role]) ? u.role : '保全';
+                return role === accountsRoleFilter;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <i data-lucide="user-x" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                        <p class="text-gray-400 font-bold tracking-tight">找不到帳號</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            listEl.innerHTML = filtered.map((u) => {
+                const role = (u && u.role && ROLE_DEFS[u.role]) ? u.role : '保全';
+                const disabled = Boolean(u && u.disabled);
+                const uid = escapeHtml(u.uid || '');
+                const email = escapeHtml(u.email || '(no email)');
+                const name = escapeHtml(u.name || '-');
+                const phone = escapeHtml(u.phone || '-');
+                return `
+                    <div class="flat-card bg-white p-5 border-none shadow-sm">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex-1 min-w-0">
+                                <p class="font-black text-gray-800 truncate">${email}</p>
+                                <p class="text-xs text-gray-500 font-medium mt-1 truncate">${name}</p>
+                                <p class="text-[10px] text-gray-300 font-bold tracking-widest mt-2 truncate">${uid}</p>
+                                <div class="mt-3 flex items-center gap-2">
+                                    <span class="text-xs font-black ${disabled ? 'text-red-600' : 'text-gray-400'}">${disabled ? '已停用' : '啟用中'}</span>
+                                    <span class="text-xs font-black text-gray-300">•</span>
+                                    <span class="text-xs font-black text-gray-400">${escapeHtml(role)}</span>
+                                    <span class="text-xs font-black text-gray-300">•</span>
+                                    <span class="text-xs font-black text-gray-400 truncate">${phone}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
         };
 
         window.handleProfileLogoutFromModal = () => {
