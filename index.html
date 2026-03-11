@@ -283,7 +283,12 @@
             <div class="absolute inset-0 flex items-center justify-center p-6">
                 <div class="w-[min(26rem,92vw)] max-h-[86vh] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col">
                     <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
-                        <div id="guard-docs-title" class="text-[#333333] text-base tracking-widest">-</div>
+                        <div class="flex items-center gap-2 text-[#333333]">
+                            <button id="guard-docs-icon-btn" type="button" class="w-10 h-10 rounded-2xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
+                                <i data-lucide="id-card" class="w-5 h-5 text-[#333333]"></i>
+                            </button>
+                            <div id="guard-docs-title" class="text-[#333333] text-base tracking-widest">-</div>
+                        </div>
                         <button onclick="closeGuardDocsModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
                             <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
                         </button>
@@ -300,7 +305,6 @@
                             <i data-lucide="shield-check" class="w-6 h-6"></i>
                         </div>
                         <div class="flex flex-col leading-tight">
-                            <div class="text-[11px] tracking-widest opacity-90">呼叫現金班</div>
                             <div id="nav-page-title" class="text-base tracking-widest font-black">-</div>
                         </div>
                     </div>
@@ -319,7 +323,6 @@
                             <i data-lucide="users" class="w-6 h-6"></i>
                         </div>
                         <div class="flex flex-col leading-tight">
-                            <div class="text-[11px] tracking-widest opacity-90">呼叫現金班</div>
                             <div class="text-base tracking-widest font-black">帳號設定</div>
                         </div>
                     </div>
@@ -388,13 +391,29 @@
                 </div>
             </div>
         </div>
+        <div id="delete-confirm-modal" class="hidden fixed inset-0 z-[90]">
+            <div class="absolute inset-0 bg-black/60"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-6">
+                <div class="w-[min(22rem,90vw)] bg-white rounded-3xl overflow-hidden shadow-2xl">
+                    <div class="p-6">
+                        <div class="text-gray-900 text-base tracking-widest font-black">是否「刪除」此帳號?</div>
+                        <div class="mt-6 grid grid-cols-2 gap-3">
+                            <button onclick="confirmDeleteAccount()" class="py-3 rounded-2xl bg-red-600 text-white tracking-widest font-black active:scale-95 transition-all">確認</button>
+                            <button onclick="closeDeleteConfirmModal()" class="py-3 rounded-2xl bg-gray-100 text-gray-700 tracking-widest font-black active:scale-95 transition-all">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="create-account-modal" class="hidden fixed inset-0 z-[80]">
             <div class="absolute inset-0 bg-black/60" onclick="closeCreateAccountModal()"></div>
             <div class="absolute inset-0 flex items-center justify-center p-4">
                 <div class="w-[min(28rem,92vw)] max-h-[92vh] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col min-h-0">
                     <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
                         <div class="flex items-center gap-2 text-[#333333]">
-                            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                            <button id="create-account-icon-btn" type="button" class="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center">
+                                <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                            </button>
                             <div id="create-account-title" class="text-base tracking-widest">新增 帳號資料</div>
                         </div>
                         <button onclick="closeCreateAccountModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
@@ -679,6 +698,11 @@
             const titleEl = document.getElementById('guard-docs-title');
             const bodyEl = document.getElementById('guard-docs-body');
             if (titleEl) titleEl.innerText = rawMode === 'bankbook' ? '銀行存摺' : '證件照片';
+            const iconBtn = document.getElementById('guard-docs-icon-btn');
+            if (iconBtn) {
+                const iconName = rawMode === 'bankbook' ? 'book' : 'id-card';
+                iconBtn.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5 text-[#333333]"></i>`;
+            }
             if (!bodyEl) {
                 modal.classList.remove('hidden');
                 lucide.createIcons();
@@ -1181,6 +1205,12 @@
             if (!el) return;
             const role = (createAccountRole && ROLE_DEFS[createAccountRole]) ? createAccountRole : '保全';
             el.innerText = `${createAccountEditingUid ? '編輯' : '新增'} ${role} 帳號資料`;
+            const iconBtn = document.getElementById('create-account-icon-btn');
+            if (iconBtn) {
+                const iconName = createAccountEditingUid ? 'pencil' : 'plus-circle';
+                iconBtn.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i>`;
+                lucide.createIcons();
+            }
         }
 
         function setCreateAccountAvatarPreview(dataUrl) {
@@ -1454,7 +1484,21 @@
         window.deleteAccountFromList = async (uid) => {
             const rawUid = String(uid || '').trim();
             if (!rawUid) return;
-            if (!confirm('確定要刪除這個帳號嗎？（將改為停用並隱藏）')) return;
+            window.__deleteConfirmUid = rawUid;
+            const modal = document.getElementById('delete-confirm-modal');
+            if (modal) modal.classList.remove('hidden');
+        };
+
+        window.closeDeleteConfirmModal = () => {
+            const modal = document.getElementById('delete-confirm-modal');
+            if (modal) modal.classList.add('hidden');
+            window.__deleteConfirmUid = '';
+        };
+
+        window.confirmDeleteAccount = async () => {
+            const rawUid = String(window.__deleteConfirmUid || '').trim();
+            if (!rawUid) return;
+            window.closeDeleteConfirmModal();
             const ok = await safeSetUserData(rawUid, {
                 disabled: true,
                 hidden: true,
