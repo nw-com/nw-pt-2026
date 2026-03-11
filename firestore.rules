@@ -73,7 +73,7 @@ service cloud.firestore {
             )
           )
         );
-      allow update: if isSelf(uid) && selfUserUpdateAllowed(isAdminArtifact(appId));
+      allow update: if (isSelf(uid) && selfUserUpdateAllowed(isAdminArtifact(appId))) || isAdminArtifact(appId);
       allow delete: if isAdminArtifact(appId);
     }
 
@@ -91,7 +91,7 @@ service cloud.firestore {
             )
           )
         );
-      allow update: if isSelf(uid) && selfUserUpdateAllowed(isAdminRoot());
+      allow update: if (isSelf(uid) && selfUserUpdateAllowed(isAdminRoot())) || isAdminRoot();
       allow delete: if isAdminRoot();
     }
 

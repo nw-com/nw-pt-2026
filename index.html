@@ -11,10 +11,10 @@
     <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#dc2626">
+    <meta name="theme-color" content="#FF7F7F">
     <link rel="manifest" href="./manifest.webmanifest?v=2">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='48'%20fill='rgb(220%2C38%2C38)'/%3E%3Cg%20transform='translate(48%2C48)scale(4)'%20fill='none'%20stroke='%23333333'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M20%2013c0%205-3.5%207.5-7.66%208.95a1%201%200%200%201-.67-.01C7.5%2020.5%204%2018%204%2013V6a1%201%200%200%201%201-1c2%200%204.5-1.2%206.24-2.72a1.17%201%200%200%201%201.52%200C14.51%203.81%2017%205%2019%205a1%201%200%200%201%201%201z'/%3E%3Cpath%20d='m9%2012%202%202%204-4'/%3E%3C/g%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='48'%20fill='rgb(220%2C38%2C38)'/%3E%3Cg%20transform='translate(48%2C48)scale(4)'%20fill='none'%20stroke='%23333333'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M20%2013c0%205-3.5%207.5-7.66%208.95a1%201%200%200%201-.67-.01C7.5%2020.5%204%2018%204%2013V6a1%201%200%200%201%201-1c2%200%204.5-1.2%206.24-2.72a1.17%201%200%200%201%201.52%200C14.51%203.81%2017%205%2019%205a1%201%200%200%201%201%201z'/%3E%3Cpath%20d='m9%2012%202%202%204-4'/%3E%3C/g%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='48'%20fill='rgb(255%2C127%2C127)'/%3E%3Cg%20transform='translate(48%2C48)scale(4)'%20fill='none'%20stroke='%23333333'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M20%2013c0%205-3.5%207.5-7.66%208.95a1%201%200%200%201-.67-.01C7.5%2020.5%204%2018%204%2013V6a1%201%200%200%201%201-1c2%200%204.5-1.2%206.24-2.72a1.17%201%200%200%201%201.52%200C14.51%203.81%2017%205%2019%205a1%201%200%200%201%201%201z'/%3E%3Cpath%20d='m9%2012%202%202%204-4'/%3E%3C/g%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='48'%20fill='rgb(255%2C127%2C127)'/%3E%3Cg%20transform='translate(48%2C48)scale(4)'%20fill='none'%20stroke='%23333333'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M20%2013c0%205-3.5%207.5-7.66%208.95a1%201%200%200%201-.67-.01C7.5%2020.5%204%2018%204%2013V6a1%201%200%200%201%201-1c2%200%204.5-1.2%206.24-2.72a1.17%201%200%200%201%201.52%200C14.51%203.81%2017%205%2019%205a1%201%200%200%201%201%201z'/%3E%3Cpath%20d='m9%2012%202%202%204-4'/%3E%3C/g%3E%3C/svg%3E">
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
@@ -35,6 +35,17 @@
         .nav-tile.active { color: rgba(255, 255, 255, 0.98); }
         .nav-tile.active .nav-icon { border-color: rgba(255, 255, 255, 0.72); }
         .nav-tile .nav-label { font-weight: 300; font-size: 14px; letter-spacing: 0.08em; }
+        :root { --brand-red: #FF7F7F; --brand-red-soft: rgba(255, 127, 127, 0.12); --brand-red-mid: rgba(255, 127, 127, 0.45); --brand-red-border: rgba(255, 127, 127, 0.25); --brand-red-shadow: rgba(255, 127, 127, 0.35); }
+        .bg-red-600 { background-color: var(--brand-red) !important; }
+        .bg-red-500 { background-color: var(--brand-red) !important; }
+        .bg-red-50 { background-color: var(--brand-red-soft) !important; }
+        .text-red-600 { color: var(--brand-red) !important; }
+        .text-red-200 { color: var(--brand-red-mid) !important; }
+        .border-red-100 { border-color: var(--brand-red-border) !important; }
+        .border-t-red-600 { border-top-color: var(--brand-red) !important; }
+        .shadow-red-200 { --tw-shadow-color: var(--brand-red-shadow) !important; }
+        .accent-red-600 { accent-color: var(--brand-red) !important; }
+        .focus\:ring-red-500:focus { --tw-ring-color: var(--brand-red) !important; }
     </style>
 </head>
 <body class="bg-white text-gray-900">
@@ -85,6 +96,9 @@
                 <button onclick="handleLogin()" class="w-full bg-red-600 text-[#333333] font-black py-5 rounded-2xl shadow-xl shadow-red-200 active:scale-95 transition-transform text-xl mt-4">
                     立即登入
                 </button>
+                <button onclick="openCreateAccountModal('join')" class="w-full bg-white text-[#333333] font-black py-5 rounded-2xl border border-gray-200 active:scale-95 transition-transform text-xl">
+                    馬上加入
+                </button>
             </div>
             
             <div class="mt-auto pb-8 text-gray-500 text-[10px] tracking-widest font-black text-center">
@@ -124,43 +138,43 @@
             <main id="content" class="hidden"></main>
 
             <nav class="bg-gradient-to-b from-[#333333] to-[#000000] border-t border-black/10 grid grid-cols-3 grid-rows-3 gap-6 px-6 py-6 safe-bottom">
-                <button id="nav-ownerList" class="nav-tile" onclick="setActiveTab('ownerList')">
-                    <div class="nav-icon"><i data-lucide="building-2" class="w-6 h-6"></i></div>
-                    <span class="nav-label">業主列表</span>
+                <button id="nav-ownerList" class="nav-tile" onclick="openNavPageModal('業主', 'ownerList')">
+                    <div class="nav-icon"><i data-lucide="crown" class="w-6 h-6"></i></div>
+                    <span class="nav-label">業主</span>
                 </button>
-                <button id="nav-officerList" class="nav-tile" onclick="setActiveTab('officerList')">
-                    <div class="nav-icon"><i data-lucide="briefcase" class="w-6 h-6"></i></div>
-                    <span class="nav-label">幹部列表</span>
+                <button id="nav-officerList" class="nav-tile" onclick="openNavPageModal('幹部', 'officerList')">
+                    <div class="nav-icon"><i data-lucide="user-star" class="w-6 h-6"></i></div>
+                    <span class="nav-label">幹部</span>
                 </button>
-                <button id="nav-guardList" class="nav-tile" onclick="setActiveTab('guardList')">
+                <button id="nav-guardList" class="nav-tile" onclick="openNavPageModal('保全', 'guardList')">
                     <div class="nav-icon"><i data-lucide="shield" class="w-6 h-6"></i></div>
-                    <span class="nav-label">保全列表</span>
+                    <span class="nav-label">保全</span>
                 </button>
 
-                <button id="nav-ownerAdd" class="nav-tile" onclick="setActiveTab('ownerAdd')">
+                <button id="nav-ownerAdd" class="nav-tile" onclick="openNavPageModal('案場', 'ownerAdd')">
                     <div class="nav-icon"><i data-lucide="building-2" class="w-6 h-6"></i></div>
-                    <span class="nav-label">新增業主</span>
+                    <span class="nav-label">案場</span>
                 </button>
-                <button id="nav-officerAdd" class="nav-tile" onclick="setActiveTab('officerAdd')">
+                <button id="nav-officerAdd" class="nav-tile" onclick="openNavPageModal('任務', 'officerAdd')">
                     <div class="nav-icon"><i data-lucide="briefcase" class="w-6 h-6"></i></div>
-                    <span class="nav-label">新增幹部</span>
+                    <span class="nav-label">任務</span>
                 </button>
-                <button id="nav-guardAdd" class="nav-tile" onclick="setActiveTab('guardAdd')">
-                    <div class="nav-icon"><i data-lucide="shield" class="w-6 h-6"></i></div>
-                    <span class="nav-label">新增保全</span>
+                <button id="nav-guardAdd" class="nav-tile" onclick="openNavPageModal('廣告', 'guardAdd')">
+                    <div class="nav-icon"><i data-lucide="megaphone" class="w-6 h-6"></i></div>
+                    <span class="nav-label">廣告</span>
                 </button>
 
-                <button id="nav-ownerSettings" class="nav-tile" onclick="setActiveTab('ownerSettings')">
-                    <div class="nav-icon"><i data-lucide="building-2" class="w-6 h-6"></i></div>
-                    <span class="nav-label">業主設定</span>
+                <button id="nav-ownerSettings" class="nav-tile" onclick="openNavPageModal('功能', 'ownerSettings')">
+                    <div class="nav-icon"><i data-lucide="grid-3x3" class="w-6 h-6"></i></div>
+                    <span class="nav-label">功能</span>
                 </button>
                 <button id="nav-officerSettings" class="nav-tile" onclick="openAccountSettings()">
                     <div class="nav-icon"><i data-lucide="users" class="w-6 h-6"></i></div>
-                    <span class="nav-label">帳號設定</span>
+                    <span class="nav-label">帳號</span>
                 </button>
-                <button id="nav-guardSettings" class="nav-tile" onclick="setActiveTab('guardSettings')">
-                    <div class="nav-icon"><i data-lucide="shield" class="w-6 h-6"></i></div>
-                    <span class="nav-label">保全設定</span>
+                <button id="nav-guardSettings" class="nav-tile" onclick="openNavPageModal('系統', 'guardSettings')">
+                    <div class="nav-icon"><i data-lucide="settings" class="w-6 h-6"></i></div>
+                    <span class="nav-label">系統</span>
                 </button>
             </nav>
         </div>
@@ -171,7 +185,10 @@
                 <div class="w-[80vw] h-[80vh] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col">
                     <input id="profile-avatar-input" type="file" accept="image/*" class="hidden" onchange="handleProfileAvatarSelected(event)">
                     <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
-                        <div class="text-[#333333] text-base tracking-widest">個人資訊</div>
+                        <div class="flex items-center gap-2 text-[#333333]">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                            <div class="text-base tracking-widest">個人資訊</div>
+                        </div>
                         <button onclick="closeProfileModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
                             <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
                         </button>
@@ -184,7 +201,11 @@
                             </button>
                             <div class="min-w-0 flex-1">
                                 <div id="profile-info-name" class="text-gray-900 text-lg tracking-widest truncate">-</div>
-                                <div id="profile-info-role" class="text-gray-500 text-sm tracking-widest truncate">-</div>
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <div id="profile-info-pending-badge" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] tracking-widest font-black shrink-0 hidden">待審核</div>
+                                    <button id="profile-supplement-btn" onclick="openSupplementModal()" class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] tracking-widest font-black shrink-0 border border-blue-100 active:scale-95 transition-transform hidden">補資料</button>
+                                    <div id="profile-info-role" class="text-gray-500 text-sm tracking-widest truncate min-w-0">-</div>
+                                </div>
                             </div>
                             <button onclick="openPhoneQrModal()" class="w-10 h-10 rounded-xl bg-gray-50 text-gray-600 active:scale-90 transition-all flex items-center justify-center border border-gray-200">
                                 <i data-lucide="qr-code" class="w-5 h-5"></i>
@@ -256,20 +277,61 @@
                 </div>
             </div>
         </div>
+        <div id="guard-docs-modal" class="hidden fixed inset-0 z-[75]">
+            <div class="absolute inset-0 bg-black/60" onclick="closeGuardDocsModal()"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-6">
+                <div class="w-[min(26rem,92vw)] max-h-[86vh] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+                    <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
+                        <div id="guard-docs-title" class="text-[#333333] text-base tracking-widest">-</div>
+                        <button onclick="closeGuardDocsModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
+                            <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
+                        </button>
+                    </div>
+                    <div id="guard-docs-body" class="flex-1 overflow-auto p-5 space-y-4 bg-gray-50"></div>
+                </div>
+            </div>
+        </div>
+        <div id="nav-page-modal" class="hidden fixed inset-0 z-[65]">
+            <div class="absolute inset-0 bg-white flex flex-col">
+                <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
+                    <div class="flex items-center gap-3 text-[#333333]">
+                        <div class="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                        <div class="flex flex-col leading-tight">
+                            <div class="text-[11px] tracking-widest opacity-90">呼叫現金班</div>
+                            <div id="nav-page-title" class="text-base tracking-widest font-black">-</div>
+                        </div>
+                    </div>
+                    <button onclick="closeNavPageModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
+                        <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
+                    </button>
+                </div>
+                <div id="nav-page-body" class="flex-1 bg-gray-50 overflow-auto"></div>
+            </div>
+        </div>
         <div id="accounts-modal" class="hidden fixed inset-0 z-[70]">
             <div class="absolute inset-0 bg-white flex flex-col">
                 <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
-                    <div class="text-[#333333] text-base tracking-widest">帳號設定</div>
+                    <div class="flex items-center gap-3 text-[#333333]">
+                        <div class="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                        <div class="flex flex-col leading-tight">
+                            <div class="text-[11px] tracking-widest opacity-90">呼叫現金班</div>
+                            <div class="text-base tracking-widest font-black">帳號設定</div>
+                        </div>
+                    </div>
                     <button onclick="closeAccountsModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
                         <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
                     </button>
                 </div>
                 <div class="px-4 pt-3 pb-2 bg-white">
                     <div class="grid grid-cols-4 gap-2">
-                        <button id="accounts-tab-guard" onclick="setAccountsRoleFilter('保全')" class="py-3 rounded-2xl bg-red-600 text-white tracking-widest active:scale-95 transition-all">保全</button>
-                        <button id="accounts-tab-officer" onclick="setAccountsRoleFilter('幹部')" class="py-3 rounded-2xl bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">幹部</button>
-                        <button id="accounts-tab-owner" onclick="setAccountsRoleFilter('業主')" class="py-3 rounded-2xl bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">業主</button>
-                        <button id="accounts-tab-admin" onclick="setAccountsRoleFilter('系統管理員')" class="py-3 rounded-2xl bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">系統管理員</button>
+                        <button id="accounts-tab-guard" onclick="setAccountsRoleFilter('保全')" class="py-3 rounded-2xl text-xs bg-red-600 text-white tracking-widest active:scale-95 transition-all">保全</button>
+                        <button id="accounts-tab-officer" onclick="setAccountsRoleFilter('幹部')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">幹部</button>
+                        <button id="accounts-tab-owner" onclick="setAccountsRoleFilter('業主')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">業主</button>
+                        <button id="accounts-tab-admin" onclick="setAccountsRoleFilter('系統管理員')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">系統管理員</button>
                     </div>
                 </div>
                 <div class="p-4 bg-white">
@@ -277,13 +339,207 @@
                         <div class="w-10 h-10 bg-yellow-400 rounded-2xl flex items-center justify-center text-[#333333] border border-yellow-500">
                             <i data-lucide="search" class="w-5 h-5"></i>
                         </div>
-                        <input id="accounts-search" placeholder="搜尋 姓名 / Email / UID / 手機" class="flex-1 px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold" oninput="loadAccountsList()">
+                        <input id="accounts-search" placeholder="搜尋 姓名 / Email / 手機號碼 / Line ID" class="flex-1 px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold" oninput="loadAccountsList()">
+                        <button onclick="openCreateAccountModal()" class="w-10 h-10 bg-red-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-200 active:scale-95 transition-all">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
                     </div>
-                    <button onclick="loadAccountsList(true)" class="w-full mt-4 bg-red-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-red-200 active:scale-95 transition-transform">
-                        重新載入帳號
-                    </button>
                 </div>
                 <div id="accounts-list" class="flex-1 overflow-auto p-4 space-y-3 bg-gray-50"></div>
+            </div>
+        </div>
+        <div id="supplement-modal" class="hidden fixed inset-0 z-[85]">
+            <div class="absolute inset-0 bg-black/60" onclick="closeSupplementModal()"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-6">
+                <div class="w-[min(22rem,90vw)] bg-white rounded-3xl overflow-hidden shadow-2xl">
+                    <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
+                        <div class="text-[#333333] text-base tracking-widest">補資料</div>
+                        <button onclick="closeSupplementModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
+                            <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div id="supplement-modal-body" class="text-sm tracking-widest text-gray-700 space-y-2"></div>
+                        <button onclick="closeSupplementModal()" class="w-full mt-6 py-3 rounded-2xl bg-gray-100 text-gray-700 tracking-widest font-black active:scale-95 transition-all">關閉</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="approval-modal" class="hidden fixed inset-0 z-[85]">
+            <div class="absolute inset-0 bg-black/60" onclick="closeApprovalModal()"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-6">
+                <div class="w-[min(22rem,90vw)] bg-white rounded-3xl overflow-hidden shadow-2xl">
+                    <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
+                        <div class="text-[#333333] text-base tracking-widest">審核</div>
+                        <button onclick="closeApprovalModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
+                            <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div id="approval-modal-title" class="text-gray-900 text-base tracking-widest font-black">核准此帳號？</div>
+                        <div id="approval-modal-subtitle" class="mt-2 text-xs tracking-widest text-gray-500 break-all"></div>
+                        <div class="mt-6 grid grid-cols-2 gap-3">
+                            <button id="approval-modal-primary" onclick="confirmApprovalAction()" class="py-3 rounded-2xl bg-green-600 text-white tracking-widest font-black active:scale-95 transition-all">核准</button>
+                            <button onclick="closeApprovalModal()" class="py-3 rounded-2xl bg-gray-100 text-gray-700 tracking-widest font-black active:scale-95 transition-all">取消</button>
+                        </div>
+                        <div id="approval-modal-status" class="mt-3 text-xs tracking-widest hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="create-account-modal" class="hidden fixed inset-0 z-[80]">
+            <div class="absolute inset-0 bg-black/60" onclick="closeCreateAccountModal()"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-4">
+                <div class="w-[min(28rem,92vw)] max-h-[92vh] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col min-h-0">
+                    <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
+                        <div class="flex items-center gap-2 text-[#333333]">
+                            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                            <div id="create-account-title" class="text-base tracking-widest">新增 帳號資料</div>
+                        </div>
+                        <button onclick="closeCreateAccountModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
+                            <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 space-y-4 overflow-auto flex-1 min-h-0">
+                        <input id="create-account-avatar-input" type="file" accept="image/*" class="hidden" onchange="handleCreateAccountAvatarSelected(event)">
+                        <input id="create-account-id-front-input" type="file" accept="image/*" class="hidden" onchange="handleCreateAccountDocSelected('idFront', event)">
+                        <input id="create-account-id-back-input" type="file" accept="image/*" class="hidden" onchange="handleCreateAccountDocSelected('idBack', event)">
+                        <input id="create-account-health-front-input" type="file" accept="image/*" class="hidden" onchange="handleCreateAccountDocSelected('healthFront', event)">
+                        <input id="create-account-bankbook-input" type="file" accept="image/*" class="hidden" onchange="handleCreateAccountDocSelected('bankbookCover', event)">
+
+                        <div class="flex items-center justify-between bg-gray-100 rounded-2xl px-4 py-3">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-12 h-12 rounded-full overflow-hidden bg-white flex items-center justify-center shrink-0">
+                                    <img id="create-account-avatar-preview" class="w-full h-full object-cover hidden" alt="大頭照">
+                                    <i id="create-account-avatar-fallback" data-lucide="user" class="w-6 h-6 text-gray-500"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-gray-400 text-[11px] tracking-widest">上傳大頭照</div>
+                                    <div id="create-account-avatar-status" class="text-xs tracking-widest text-gray-500 truncate">未選擇</div>
+                                </div>
+                            </div>
+                            <button onclick="triggerCreateAccountAvatarUpload()" class="w-10 h-10 rounded-2xl bg-white text-gray-700 active:scale-95 transition-all flex items-center justify-center border border-gray-200">
+                                <i data-lucide="upload" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">姓名</div>
+                                <input id="create-account-name" placeholder="輸入姓名" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">手機號碼</div>
+                                <input id="create-account-phone" type="tel" inputmode="numeric" placeholder="輸入手機號碼" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">Line ID</div>
+                            <input id="create-account-line-id" placeholder="輸入 Line ID" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">Email</div>
+                            <input id="create-account-email" type="email" placeholder="輸入 Email" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">預設密碼</div>
+                            <input id="create-account-password" type="password" placeholder="未填則預設為 123456" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                        </div>
+                        <div class="space-y-2">
+                            <div id="create-account-role-label" class="text-gray-400 text-[11px] tracking-widest">角色</div>
+                            <div id="create-account-role-block" class="grid grid-cols-2 gap-2">
+                                <button id="create-account-role-guard" onclick="setCreateAccountRole('保全')" class="py-3 rounded-2xl text-xs bg-red-600 text-white tracking-widest active:scale-95 transition-all">保全</button>
+                                <button id="create-account-role-officer" onclick="setCreateAccountRole('幹部')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">幹部</button>
+                                <button id="create-account-role-owner" onclick="setCreateAccountRole('業主')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">業主</button>
+                                <button id="create-account-role-admin" onclick="setCreateAccountRole('系統管理員')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">系統管理員</button>
+                            </div>
+                        </div>
+                        <div id="create-account-guard-fields" class="space-y-4 hidden">
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">身分證號</div>
+                                <input id="create-account-id-number" placeholder="輸入身分證號" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">出生年月日</div>
+                                <input id="create-account-birthdate" type="date" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">通訊地址</div>
+                                <input id="create-account-address" placeholder="輸入通訊地址" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="space-y-1">
+                                    <div class="text-gray-400 text-[11px] tracking-widest">上傳身分證(正面)</div>
+                                    <button onclick="triggerCreateAccountDocUpload('idFront')" class="w-full px-4 py-3 bg-gray-100 rounded-2xl active:scale-95 transition-all flex items-center justify-between">
+                                        <span id="create-account-idFront-status" class="text-sm font-bold text-gray-700 tracking-widest">未選擇</span>
+                                        <i data-lucide="upload" class="w-5 h-5 text-gray-500"></i>
+                                    </button>
+                                    <img id="create-account-idFront-preview" class="w-full h-28 rounded-2xl border border-gray-200 bg-white object-contain hidden" alt="身份證（正面）">
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="text-gray-400 text-[11px] tracking-widest">上傳身分證(背面)</div>
+                                    <button onclick="triggerCreateAccountDocUpload('idBack')" class="w-full px-4 py-3 bg-gray-100 rounded-2xl active:scale-95 transition-all flex items-center justify-between">
+                                        <span id="create-account-idBack-status" class="text-sm font-bold text-gray-700 tracking-widest">未選擇</span>
+                                        <i data-lucide="upload" class="w-5 h-5 text-gray-500"></i>
+                                    </button>
+                                    <img id="create-account-idBack-preview" class="w-full h-28 rounded-2xl border border-gray-200 bg-white object-contain hidden" alt="身份證（背面）">
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">健保卡(正面)</div>
+                                <button onclick="triggerCreateAccountDocUpload('healthFront')" class="w-full px-4 py-3 bg-gray-100 rounded-2xl active:scale-95 transition-all flex items-center justify-between">
+                                    <span id="create-account-healthFront-status" class="text-sm font-bold text-gray-700 tracking-widest">未選擇</span>
+                                    <i data-lucide="upload" class="w-5 h-5 text-gray-500"></i>
+                                </button>
+                                <img id="create-account-healthFront-preview" class="w-full h-36 rounded-2xl border border-gray-200 bg-white object-contain hidden" alt="健保卡（正面）">
+                            </div>
+
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">匯款銀行名稱</div>
+                                <input id="create-account-bank-name" placeholder="輸入匯款銀行名稱" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">匯款銀行帳號</div>
+                                <input id="create-account-bank-account" inputmode="numeric" placeholder="輸入匯款銀行帳號" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">匯款銀行戶名</div>
+                                <input id="create-account-bank-holder" placeholder="輸入匯款銀行戶名" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">上傳銀行存摺封面</div>
+                                <button onclick="triggerCreateAccountDocUpload('bankbookCover')" class="w-full px-4 py-3 bg-gray-100 rounded-2xl active:scale-95 transition-all flex items-center justify-between">
+                                    <span id="create-account-bankbookCover-status" class="text-sm font-bold text-gray-700 tracking-widest">未選擇</span>
+                                    <i data-lucide="upload" class="w-5 h-5 text-gray-500"></i>
+                                </button>
+                                <img id="create-account-bankbookCover-preview" class="w-full h-36 rounded-2xl border border-gray-200 bg-white object-contain hidden" alt="銀行存摺封面">
+                            </div>
+
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">緊急聯絡人</div>
+                                <input id="create-account-emergency-name" placeholder="輸入緊急聯絡人姓名" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">緊急聯絡人關係</div>
+                                <select id="create-account-emergency-relation" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                                    <option value="配偶">配偶</option>
+                                    <option value="父母">父母</option>
+                                    <option value="子女">子女</option>
+                                    <option value="朋友">朋友</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-gray-400 text-[11px] tracking-widest">緊急聯絡人手機號碼</div>
+                                <input id="create-account-emergency-phone" type="tel" inputmode="numeric" placeholder="輸入緊急聯絡人手機號碼" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                        </div>
+                        <div id="create-account-status" class="text-xs tracking-widest text-gray-500 hidden"></div>
+                        <button onclick="submitCreateAccount()" class="w-full bg-red-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-red-200 active:scale-95 transition-transform">
+                            儲存
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -291,7 +547,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, browserSessionPersistence, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence, browserSessionPersistence, inMemoryPersistence, updatePassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -306,6 +562,8 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const secondaryApp = initializeApp(firebaseConfig, 'secondary');
+        const secondaryAuth = getAuth(secondaryApp);
         const db = getFirestore(app);
         const appId = 'nw-pt-2026';
         const ROLE_DEFS = {
@@ -364,6 +622,10 @@
         }
 
         window.openPhoneQrModal = () => {
+            if (isPendingUser()) {
+                showPendingTip();
+                return;
+            }
             const modal = document.getElementById('phone-qr-modal');
             const nameEl = document.getElementById('phone-qr-name');
             const numberEl = document.getElementById('phone-qr-number');
@@ -400,10 +662,87 @@
             if (modal) modal.classList.add('hidden');
         };
 
+        window.openGuardDocsModal = (uid, mode = 'identity') => {
+            if (isPendingUser()) {
+                showPendingTip();
+                return;
+            }
+            const rawUid = String(uid || '').trim();
+            const rawMode = String(mode || '').trim();
+            const modal = document.getElementById('guard-docs-modal');
+            if (!modal) return;
+            const u = accountsUsersByUid && rawUid ? accountsUsersByUid[rawUid] : null;
+            const guard = u?.guardProfile || {};
+            const docs = guard?.docs && typeof guard.docs === 'object' ? guard.docs : {};
+
+            const titleEl = document.getElementById('guard-docs-title');
+            const bodyEl = document.getElementById('guard-docs-body');
+            if (titleEl) titleEl.innerText = rawMode === 'bankbook' ? '銀行存摺' : '證件照片';
+            if (!bodyEl) {
+                modal.classList.remove('hidden');
+                lucide.createIcons();
+                return;
+            }
+
+            const items = rawMode === 'bankbook'
+                ? [
+                    { label: '銀行存摺', src: String(docs?.bankbookCover || '') }
+                ]
+                : [
+                    { label: '身份證（正面）', src: String(docs?.idFront || '') },
+                    { label: '身份證（反面）', src: String(docs?.idBack || '') },
+                    { label: '健保卡（正面）', src: String(docs?.healthFront || '') }
+                ];
+
+            bodyEl.innerHTML = items.map((it) => {
+                const label = escapeHtml(it.label || '');
+                const src = String(it.src || '').trim();
+                const safeSrc = escapeHtml(src);
+                if (!src) {
+                    return `
+                        <div class="bg-white rounded-3xl p-4 shadow-sm">
+                            <div class="text-gray-400 text-[11px] tracking-widest">${label}</div>
+                            <div class="mt-3 h-48 rounded-2xl border border-gray-200 bg-gray-50 flex items-center justify-center text-gray-400">
+                                <div class="flex items-center gap-2 text-xs tracking-widest">
+                                    <i data-lucide="image-off" class="w-5 h-5"></i>
+                                    <div>未上傳</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="bg-white rounded-3xl p-4 shadow-sm">
+                        <div class="text-gray-400 text-[11px] tracking-widest">${label}</div>
+                        <div class="mt-3 rounded-2xl border border-gray-200 bg-white overflow-hidden">
+                            <img src="${safeSrc}" class="w-full max-h-[56vh] object-contain" alt="${label}">
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closeGuardDocsModal = () => {
+            const modal = document.getElementById('guard-docs-modal');
+            const bodyEl = document.getElementById('guard-docs-body');
+            if (bodyEl) bodyEl.innerHTML = '';
+            if (modal) modal.classList.add('hidden');
+        };
+
         let currentUserData = null;
         let activeTab = 'ownerList';
         let dbScope = 'artifacts';
         let hasDbAccess = true;
+        let createAccountMode = '';
+        function isPendingUser() {
+            return Boolean(currentUserData && String(currentUserData.approvalStatus || '') === 'pending');
+        }
+        function showPendingTip() {
+            alert('審核中，尚未開通。');
+        }
 
         function userDocRef(uid) {
             return dbScope === 'root'
@@ -514,6 +853,9 @@
             const role = (userData && userData.role) ? userData.role : '';
             const email = (userData && userData.email) ? userData.email : ((user && user.email) ? user.email : '');
             const uid = (userData && userData.uid) ? userData.uid : ((user && user.uid) ? user.uid : '');
+            const phone = (userData && userData.phone) ? userData.phone : '';
+            const lineId = (userData && userData.lineId) ? userData.lineId : '';
+            const approvalStatus = (userData && userData.approvalStatus) ? String(userData.approvalStatus) : '';
             const avatarDataUrl = (userData && userData.avatarDataUrl) ? userData.avatarDataUrl : '';
             const photoURL = (user && user.photoURL) ? user.photoURL : ((userData && userData.photoURL) ? userData.photoURL : '');
             let localAvatar = '';
@@ -559,8 +901,27 @@
             setText('profile-info-name', displayName);
             setText('profile-info-role', role || '-');
             setText('profile-info-email', email);
-            setText('profile-info-phone', '0922760761');
-            setText('profile-info-line', 'beebox.com');
+            setText('profile-info-phone', phone);
+            setText('profile-info-line', lineId);
+            const pendingBadge = document.getElementById('profile-info-pending-badge');
+            const supplementBtn = document.getElementById('profile-supplement-btn');
+            if (pendingBadge) {
+                const status = approvalStatus === 'pending' ? 'pending' : (approvalStatus === 'approved' ? 'approved' : '');
+                if (!status) {
+                    pendingBadge.classList.add('hidden');
+                } else {
+                    pendingBadge.classList.remove('hidden');
+                    pendingBadge.classList.remove('bg-amber-100', 'text-amber-700', 'bg-green-100', 'text-green-700');
+                    if (status === 'pending') {
+                        pendingBadge.innerText = '待審核';
+                        pendingBadge.classList.add('bg-amber-100', 'text-amber-700');
+                    } else {
+                        pendingBadge.innerText = '審核通過';
+                        pendingBadge.classList.add('bg-green-100', 'text-green-700');
+                    }
+                }
+            }
+            if (supplementBtn) supplementBtn.classList.toggle('hidden', approvalStatus !== 'approved');
         }
 
         window.openProfileModal = () => {
@@ -577,8 +938,194 @@
             modal.classList.add('hidden');
         };
 
-        let accountsCache = null;
+        window.openNavPageModal = (title, tab) => {
+            if (isPendingUser()) {
+                showPendingTip();
+                return;
+            }
+            if (tab) window.setActiveTab(tab);
+            const modal = document.getElementById('nav-page-modal');
+            if (!modal) return;
+            const titleEl = document.getElementById('nav-page-title');
+            if (titleEl) titleEl.innerText = String(title || '-');
+            const bodyEl = document.getElementById('nav-page-body');
+            if (bodyEl) bodyEl.innerHTML = '';
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closeNavPageModal = () => {
+            const modal = document.getElementById('nav-page-modal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+        };
+
         let accountsRoleFilter = '保全';
+        let accountsLoadTimer = null;
+        let accountsLoadSeq = 0;
+        let accountsUsersByUid = {};
+        let approvalTargetUid = '';
+        let approvalActionMode = 'approve';
+        let createAccountRole = '保全';
+        let createAccountEditingUid = '';
+        let createAccountAvatarDataUrl = '';
+        let createAccountDocs = {};
+
+        window.openSupplementModal = () => {
+            if (isPendingUser()) {
+                showPendingTip();
+                return;
+            }
+            const modal = document.getElementById('supplement-modal');
+            const bodyEl = document.getElementById('supplement-modal-body');
+            if (!modal || !bodyEl) return;
+            const u = currentUserData || {};
+            const missing = [];
+            const add = (label, ok) => {
+                if (!ok) missing.push(String(label));
+            };
+            add('姓名', Boolean(String(u.name || '').trim()));
+            add('手機號碼', Boolean(String(u.phone || '').trim()));
+            add('Line ID', Boolean(String(u.lineId || '').trim()));
+            add('大頭照', Boolean(String(u.avatarDataUrl || '').trim()));
+
+            if (String(u.role || '') === '保全') {
+                const g = u.guardProfile && typeof u.guardProfile === 'object' ? u.guardProfile : {};
+                add('身分證號', Boolean(String(g.idNumber || '').trim()));
+                add('出生年月日', Boolean(String(g.birthdate || '').trim()));
+                add('通訊地址', Boolean(String(g.address || '').trim()));
+                add('匯款銀行名稱', Boolean(String(g.bankName || '').trim()));
+                add('匯款銀行帳號', Boolean(String(g.bankAccount || '').trim()));
+                add('匯款銀行戶名', Boolean(String(g.bankHolder || '').trim()));
+                add('緊急聯絡人', Boolean(String(g.emergencyName || '').trim()));
+                add('緊急聯絡人關係', Boolean(String(g.emergencyRelation || '').trim()));
+                add('緊急聯絡人手機號碼', Boolean(String(g.emergencyPhone || '').trim()));
+                const docs = g.docs && typeof g.docs === 'object' ? g.docs : {};
+                add('身分證（正面）', Boolean(String(docs.idFront || '').trim()));
+                add('身分證（背面）', Boolean(String(docs.idBack || '').trim()));
+                add('健保卡（正面）', Boolean(String(docs.healthFront || '').trim()));
+                add('銀行存摺封面', Boolean(String(docs.bankbookCover || '').trim()));
+            }
+
+            if (missing.length === 0) {
+                bodyEl.innerHTML = `<div class="text-gray-500 text-sm tracking-widest">資料已完整</div>`;
+            } else {
+                bodyEl.innerHTML = missing.map((m) => `<div class="flex items-start gap-2"><div class="mt-[2px] w-2 h-2 rounded-full bg-red-300 shrink-0"></div><div>${escapeHtml(m)}</div></div>`).join('');
+            }
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closeSupplementModal = () => {
+            const modal = document.getElementById('supplement-modal');
+            if (modal) modal.classList.add('hidden');
+            const bodyEl = document.getElementById('supplement-modal-body');
+            if (bodyEl) bodyEl.innerHTML = '';
+        };
+
+        function updateApprovalModalUi(rawUid) {
+            const titleEl = document.getElementById('approval-modal-title');
+            const primaryBtn = document.getElementById('approval-modal-primary');
+            if (titleEl) titleEl.innerText = approvalActionMode === 'revert' ? '退回待審核？' : '核准此帳號？';
+            if (primaryBtn) {
+                primaryBtn.innerText = approvalActionMode === 'revert' ? '退回待審核' : '核准';
+                primaryBtn.classList.remove('bg-green-600', 'bg-amber-500');
+                primaryBtn.classList.add(approvalActionMode === 'revert' ? 'bg-amber-500' : 'bg-green-600');
+            }
+            const u = accountsUsersByUid && accountsUsersByUid[rawUid] ? accountsUsersByUid[rawUid] : null;
+            const subtitleEl = document.getElementById('approval-modal-subtitle');
+            if (subtitleEl) {
+                const email = u?.email ? String(u.email) : '';
+                const name = u?.name ? String(u.name) : '';
+                const phone = u?.phone ? String(u.phone) : '';
+                const safeName = escapeHtml(name || '-');
+                const safeEmail = escapeHtml(email || '-');
+                const safePhone = escapeHtml(phone || '-');
+                subtitleEl.innerHTML = `
+                    <div>姓名：${safeName}</div>
+                    <div>Email：${safeEmail}</div>
+                    <div>手機號碼：${safePhone}</div>
+                `;
+            }
+        }
+
+        window.openApprovalModal = (uid) => {
+            const rawUid = String(uid || '').trim();
+            if (!rawUid) return;
+            if (!currentUserData || currentUserData.role !== '系統管理員') return;
+            approvalActionMode = 'approve';
+            approvalTargetUid = rawUid;
+            const modal = document.getElementById('approval-modal');
+            if (!modal) return;
+            const statusEl = document.getElementById('approval-modal-status');
+            updateApprovalModalUi(rawUid);
+            if (statusEl) {
+                statusEl.classList.add('hidden');
+                statusEl.innerText = '';
+            }
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.openRevertApprovalModal = (uid) => {
+            const rawUid = String(uid || '').trim();
+            if (!rawUid) return;
+            if (!currentUserData || currentUserData.role !== '系統管理員') return;
+            approvalActionMode = 'revert';
+            approvalTargetUid = rawUid;
+            const modal = document.getElementById('approval-modal');
+            if (!modal) return;
+            const statusEl = document.getElementById('approval-modal-status');
+            updateApprovalModalUi(rawUid);
+            if (statusEl) {
+                statusEl.classList.add('hidden');
+                statusEl.innerText = '';
+            }
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closeApprovalModal = () => {
+            const modal = document.getElementById('approval-modal');
+            if (modal) modal.classList.add('hidden');
+            approvalTargetUid = '';
+            const statusEl = document.getElementById('approval-modal-status');
+            if (statusEl) {
+                statusEl.classList.add('hidden');
+                statusEl.innerText = '';
+            }
+        };
+
+        window.confirmApprovalAction = async () => {
+            const uid = String(approvalTargetUid || '').trim();
+            if (!uid) return;
+            if (!currentUserData || currentUserData.role !== '系統管理員') return;
+            const statusEl = document.getElementById('approval-modal-status');
+            if (statusEl) {
+                statusEl.classList.remove('hidden');
+                statusEl.classList.remove('text-red-600', 'text-green-600', 'text-gray-500');
+                statusEl.classList.add('text-gray-500');
+                statusEl.innerText = '處理中…';
+            }
+            const nextApproval = approvalActionMode === 'revert' ? 'pending' : 'approved';
+            const ok = await safeSetUserData(uid, {
+                approvalStatus: nextApproval,
+                disabled: false,
+                hidden: false,
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
+            if (!ok) {
+                if (statusEl) {
+                    statusEl.classList.remove('text-gray-500');
+                    statusEl.classList.add('text-red-600');
+                    statusEl.innerText = '資料庫存取權限不足';
+                }
+                return;
+            }
+            await loadAccountsList(true);
+            window.closeApprovalModal();
+        };
+        window.approvePendingAccount = window.confirmApprovalAction;
 
         function updateAccountsTabsUI() {
             const defs = [
@@ -601,10 +1148,462 @@
         window.setAccountsRoleFilter = async (role) => {
             accountsRoleFilter = role;
             updateAccountsTabsUI();
-            await loadAccountsList(false);
+            await loadAccountsList(true);
+        };
+
+        function updateCreateAccountRoleUI() {
+            const defs = [
+                { id: 'create-account-role-guard', role: '保全' },
+                { id: 'create-account-role-officer', role: '幹部' },
+                { id: 'create-account-role-owner', role: '業主' },
+                { id: 'create-account-role-admin', role: '系統管理員' }
+            ];
+            defs.forEach(({ id, role }) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const active = createAccountRole === role;
+                el.classList.toggle('bg-red-600', active);
+                el.classList.toggle('text-white', active);
+                el.classList.toggle('bg-gray-100', !active);
+                el.classList.toggle('text-gray-600', !active);
+            });
+        }
+
+        function updateCreateAccountGuardFieldsUI() {
+            const el = document.getElementById('create-account-guard-fields');
+            if (!el) return;
+            el.classList.toggle('hidden', createAccountRole !== '保全');
+        }
+
+        function updateCreateAccountTitle() {
+            const el = document.getElementById('create-account-title');
+            if (!el) return;
+            const role = (createAccountRole && ROLE_DEFS[createAccountRole]) ? createAccountRole : '保全';
+            el.innerText = `${createAccountEditingUid ? '編輯' : '新增'} ${role} 帳號資料`;
+        }
+
+        function setCreateAccountAvatarPreview(dataUrl) {
+            const imgEl = document.getElementById('create-account-avatar-preview');
+            const fallbackEl = document.getElementById('create-account-avatar-fallback');
+            const statusEl = document.getElementById('create-account-avatar-status');
+            if (imgEl && fallbackEl) {
+                if (!dataUrl) {
+                    imgEl.classList.add('hidden');
+                    imgEl.removeAttribute('src');
+                    fallbackEl.classList.remove('hidden');
+                } else {
+                    imgEl.src = dataUrl;
+                    imgEl.classList.remove('hidden');
+                    fallbackEl.classList.add('hidden');
+                }
+            }
+            if (statusEl) statusEl.innerText = dataUrl ? '已選擇' : '未選擇';
+        }
+
+        function setCreateAccountDocStatus(key, dataUrl = '') {
+            const el = document.getElementById(`create-account-${key}-status`);
+            if (el) el.innerText = dataUrl ? '已選擇' : '未選擇';
+            const imgEl = document.getElementById(`create-account-${key}-preview`);
+            if (!imgEl) return;
+            if (!dataUrl) {
+                imgEl.classList.add('hidden');
+                imgEl.removeAttribute('src');
+                return;
+            }
+            imgEl.src = dataUrl;
+            imgEl.classList.remove('hidden');
+        }
+
+        function readImageFileToJpegDataUrl(file, options = { maxSize: 1280, quality: 0.82 }) {
+            const maxSize = Number(options?.maxSize || 1280);
+            const quality = Number(options?.quality || 0.82);
+            return new Promise((resolve, reject) => {
+                if (!file) return resolve('');
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('read-failed'));
+                reader.onload = () => {
+                    const src = String(reader.result || '');
+                    const img = new Image();
+                    img.onerror = () => resolve(src);
+                    img.onload = () => {
+                        const w = img.naturalWidth || img.width || 0;
+                        const h = img.naturalHeight || img.height || 0;
+                        if (!w || !h) return resolve(src);
+                        const scale = Math.min(1, maxSize / Math.max(w, h));
+                        const cw = Math.max(1, Math.round(w * scale));
+                        const ch = Math.max(1, Math.round(h * scale));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = cw;
+                        canvas.height = ch;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) return resolve(src);
+                        ctx.drawImage(img, 0, 0, cw, ch);
+                        try {
+                            resolve(canvas.toDataURL('image/jpeg', quality));
+                        } catch {
+                            resolve(src);
+                        }
+                    };
+                    img.src = src;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.triggerCreateAccountAvatarUpload = () => {
+            const el = document.getElementById('create-account-avatar-input');
+            if (el) el.click();
+        };
+
+        window.handleCreateAccountAvatarSelected = async (e) => {
+            const input = e && e.target ? e.target : null;
+            const file = input && input.files && input.files[0] ? input.files[0] : null;
+            if (!file) return;
+            if (input) input.value = '';
+            if (!file.type || !file.type.startsWith('image/')) {
+                setProfileStatus('create-account-status', '請選擇圖片檔案', 'error');
+                return;
+            }
+            setProfileStatus('create-account-status', '', 'muted');
+            const dataUrl = await readImageFileToJpegDataUrl(file, { maxSize: 768, quality: 0.85 });
+            createAccountAvatarDataUrl = dataUrl || '';
+            setCreateAccountAvatarPreview(createAccountAvatarDataUrl);
+        };
+
+        window.triggerCreateAccountDocUpload = (key) => {
+            const map = {
+                idFront: 'create-account-id-front-input',
+                idBack: 'create-account-id-back-input',
+                healthFront: 'create-account-health-front-input',
+                bankbookCover: 'create-account-bankbook-input'
+            };
+            const id = map && key ? map[key] : '';
+            const el = id ? document.getElementById(id) : null;
+            if (el) el.click();
+        };
+
+        window.handleCreateAccountDocSelected = async (key, e) => {
+            const input = e && e.target ? e.target : null;
+            const file = input && input.files && input.files[0] ? input.files[0] : null;
+            if (!file) return;
+            if (input) input.value = '';
+            if (!file.type || !file.type.startsWith('image/')) {
+                setProfileStatus('create-account-status', '請選擇圖片檔案', 'error');
+                return;
+            }
+            setProfileStatus('create-account-status', '', 'muted');
+            const dataUrl = await readImageFileToJpegDataUrl(file, { maxSize: 1280, quality: 0.8 });
+            if (dataUrl && dataUrl.length > 900000) {
+                setProfileStatus('create-account-status', '圖片太大，請換較小的圖片', 'error');
+                return;
+            }
+            createAccountDocs = createAccountDocs || {};
+            if (key) createAccountDocs[key] = dataUrl || '';
+            if (key) setCreateAccountDocStatus(key, dataUrl || '');
+        };
+
+        window.setCreateAccountRole = (role) => {
+            createAccountRole = role;
+            updateCreateAccountRoleUI();
+            updateCreateAccountTitle();
+            updateCreateAccountGuardFieldsUI();
+        };
+
+        window.openCreateAccountModal = (mode = '') => {
+            const modal = document.getElementById('create-account-modal');
+            if (!modal) return;
+            createAccountMode = mode || '';
+            createAccountEditingUid = '';
+            createAccountRole = mode === 'join' ? '保全' : accountsRoleFilter;
+            updateCreateAccountRoleUI();
+            updateCreateAccountTitle();
+            const emailEl = document.getElementById('create-account-email');
+            const pwEl = document.getElementById('create-account-password');
+            const nameEl = document.getElementById('create-account-name');
+            const phoneEl = document.getElementById('create-account-phone');
+            const lineIdEl = document.getElementById('create-account-line-id');
+            if (emailEl) emailEl.value = '';
+            if (pwEl) pwEl.value = '';
+            if (nameEl) nameEl.value = '';
+            if (phoneEl) phoneEl.value = '';
+            if (lineIdEl) lineIdEl.value = '';
+            const idNumberEl = document.getElementById('create-account-id-number');
+            const birthEl = document.getElementById('create-account-birthdate');
+            const addrEl = document.getElementById('create-account-address');
+            const bankNameEl = document.getElementById('create-account-bank-name');
+            const bankAccEl = document.getElementById('create-account-bank-account');
+            const bankHolderEl = document.getElementById('create-account-bank-holder');
+            const emerNameEl = document.getElementById('create-account-emergency-name');
+            const emerRelEl = document.getElementById('create-account-emergency-relation');
+            const emerPhoneEl = document.getElementById('create-account-emergency-phone');
+            if (idNumberEl) idNumberEl.value = '';
+            if (birthEl) birthEl.value = '';
+            if (addrEl) addrEl.value = '';
+            if (bankNameEl) bankNameEl.value = '';
+            if (bankAccEl) bankAccEl.value = '';
+            if (bankHolderEl) bankHolderEl.value = '';
+            if (bankHolderEl) bankHolderEl.dataset.autofillFromName = 'true';
+            if (emerNameEl) emerNameEl.value = '';
+            if (emerRelEl) emerRelEl.value = '配偶';
+            if (emerPhoneEl) emerPhoneEl.value = '';
+            createAccountAvatarDataUrl = '';
+            createAccountDocs = {};
+            setCreateAccountAvatarPreview('');
+            setCreateAccountDocStatus('idFront', '');
+            setCreateAccountDocStatus('idBack', '');
+            setCreateAccountDocStatus('healthFront', '');
+            setCreateAccountDocStatus('bankbookCover', '');
+            updateCreateAccountGuardFieldsUI();
+            const roleBlock = document.getElementById('create-account-role-block');
+            const roleLabel = document.getElementById('create-account-role-label');
+            if (roleBlock) roleBlock.classList.toggle('hidden', mode === 'join');
+            if (roleLabel) roleLabel.classList.toggle('hidden', mode === 'join');
+            setProfileStatus('create-account-status', '', 'muted');
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+            if (emailEl) emailEl.focus();
+        };
+
+        window.openEditAccountModal = (uid) => {
+            const modal = document.getElementById('create-account-modal');
+            if (!modal) return;
+            createAccountMode = '';
+            const rawUid = String(uid || '').trim();
+            if (!rawUid) return;
+            const u = accountsUsersByUid && accountsUsersByUid[rawUid] ? accountsUsersByUid[rawUid] : null;
+            createAccountEditingUid = rawUid;
+
+            const role = (u && u.role && ROLE_DEFS[u.role]) ? u.role : '保全';
+            createAccountRole = role;
+            updateCreateAccountRoleUI();
+            updateCreateAccountTitle();
+            updateCreateAccountGuardFieldsUI();
+            const roleBlock = document.getElementById('create-account-role-block');
+            const roleLabel = document.getElementById('create-account-role-label');
+            if (roleBlock) roleBlock.classList.remove('hidden');
+            if (roleLabel) roleLabel.classList.remove('hidden');
+
+            const emailEl = document.getElementById('create-account-email');
+            const pwEl = document.getElementById('create-account-password');
+            const nameEl = document.getElementById('create-account-name');
+            const phoneEl = document.getElementById('create-account-phone');
+            const lineIdEl = document.getElementById('create-account-line-id');
+            if (emailEl) emailEl.value = String(u?.email || '');
+            if (pwEl) pwEl.value = '';
+            if (nameEl) nameEl.value = String(u?.name || '');
+            if (phoneEl) phoneEl.value = String(u?.phone || '');
+            if (lineIdEl) lineIdEl.value = String(u?.lineId || '');
+
+            createAccountAvatarDataUrl = String(u?.avatarDataUrl || '');
+            setCreateAccountAvatarPreview(createAccountAvatarDataUrl);
+
+            const guard = u?.guardProfile || {};
+            const idNumberEl = document.getElementById('create-account-id-number');
+            const birthEl = document.getElementById('create-account-birthdate');
+            const addrEl = document.getElementById('create-account-address');
+            const bankNameEl = document.getElementById('create-account-bank-name');
+            const bankAccEl = document.getElementById('create-account-bank-account');
+            const bankHolderEl = document.getElementById('create-account-bank-holder');
+            const emerNameEl = document.getElementById('create-account-emergency-name');
+            const emerRelEl = document.getElementById('create-account-emergency-relation');
+            const emerPhoneEl = document.getElementById('create-account-emergency-phone');
+            if (idNumberEl) idNumberEl.value = String(guard?.idNumber || '');
+            if (birthEl) birthEl.value = String(guard?.birthdate || '');
+            if (addrEl) addrEl.value = String(guard?.address || '');
+            if (bankNameEl) bankNameEl.value = String(guard?.bankName || '');
+            if (bankAccEl) bankAccEl.value = String(guard?.bankAccount || '');
+            if (bankHolderEl) bankHolderEl.value = String(guard?.bankHolder || '');
+            if (bankHolderEl) bankHolderEl.dataset.autofillFromName = 'false';
+            if (emerNameEl) emerNameEl.value = String(guard?.emergencyName || '');
+            if (emerRelEl) emerRelEl.value = String(guard?.emergencyRelation || '配偶');
+            if (emerPhoneEl) emerPhoneEl.value = String(guard?.emergencyPhone || '');
+
+            createAccountDocs = {};
+            if (guard?.docs && typeof guard.docs === 'object') {
+                createAccountDocs.idFront = String(guard.docs.idFront || '');
+                createAccountDocs.idBack = String(guard.docs.idBack || '');
+                createAccountDocs.healthFront = String(guard.docs.healthFront || '');
+                createAccountDocs.bankbookCover = String(guard.docs.bankbookCover || '');
+            }
+            setCreateAccountDocStatus('idFront', createAccountDocs.idFront);
+            setCreateAccountDocStatus('idBack', createAccountDocs.idBack);
+            setCreateAccountDocStatus('healthFront', createAccountDocs.healthFront);
+            setCreateAccountDocStatus('bankbookCover', createAccountDocs.bankbookCover);
+
+            setProfileStatus('create-account-status', '', 'muted');
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        {
+            const nameEl = document.getElementById('create-account-name');
+            const bankHolderEl = document.getElementById('create-account-bank-holder');
+            if (nameEl && bankHolderEl) {
+                nameEl.addEventListener('input', () => {
+                    if (bankHolderEl.dataset.autofillFromName === 'true') {
+                        bankHolderEl.value = String(nameEl.value || '');
+                    }
+                });
+                bankHolderEl.addEventListener('input', () => {
+                    bankHolderEl.dataset.autofillFromName = 'false';
+                });
+            }
+        }
+
+        window.deleteAccountFromList = async (uid) => {
+            const rawUid = String(uid || '').trim();
+            if (!rawUid) return;
+            if (!confirm('確定要刪除這個帳號嗎？（將改為停用並隱藏）')) return;
+            const ok = await safeSetUserData(rawUid, {
+                disabled: true,
+                hidden: true,
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
+            if (!ok) {
+                alert('資料庫存取權限不足，無法刪除帳號');
+                return;
+            }
+            await loadAccountsList(true);
+        };
+
+        window.closeCreateAccountModal = () => {
+            const modal = document.getElementById('create-account-modal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            createAccountMode = '';
+            setProfileStatus('create-account-status', '', 'muted');
+        };
+
+        window.submitCreateAccount = async () => {
+            const email = String(document.getElementById('create-account-email')?.value || '').trim();
+            const name = String(document.getElementById('create-account-name')?.value || '').trim();
+            const phone = String(document.getElementById('create-account-phone')?.value || '').trim();
+            const lineId = String(document.getElementById('create-account-line-id')?.value || '').trim();
+            const passwordInput = String(document.getElementById('create-account-password')?.value || '').trim();
+            const password = passwordInput || '123456';
+            const role = (createAccountRole && ROLE_DEFS[createAccountRole]) ? createAccountRole : '保全';
+
+            if (!email && !createAccountEditingUid) {
+                setProfileStatus('create-account-status', '請輸入 Email', 'error');
+                return;
+            }
+            if (!hasDbAccess && createAccountMode !== 'join') {
+                setProfileStatus('create-account-status', '資料庫存取權限不足', 'error');
+                return;
+            }
+
+            setProfileStatus('create-account-status', '處理中…', 'muted');
+            let uid = '';
+            let existing = null;
+            try {
+                if (createAccountEditingUid) {
+                    uid = createAccountEditingUid;
+                    const snap = await withDbFallback(() => getDoc(userDocRef(uid)));
+                    existing = snap.exists() ? snap.data() : null;
+                } else {
+                    if (createAccountMode === 'join') {
+                        const cred = await createUserWithEmailAndPassword(auth, email, password);
+                        uid = cred?.user?.uid ? String(cred.user.uid) : '';
+                    } else {
+                        await setPersistence(secondaryAuth, inMemoryPersistence);
+                        const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+                        uid = cred?.user?.uid ? String(cred.user.uid) : '';
+                    }
+                    if (!uid) {
+                        setProfileStatus('create-account-status', '建立帳號失敗（無法取得 UID）', 'error');
+                        return;
+                    }
+                    const snap = await withDbFallback(() => getDoc(userDocRef(uid)));
+                    if (snap.exists()) {
+                        setProfileStatus('create-account-status', '此帳號資料已存在，請改用編輯', 'error');
+                        return;
+                    }
+                }
+            } catch (e) {
+                if (e && e.code === 'auth/email-already-in-use') {
+                    setProfileStatus('create-account-status', '此 Email 已存在（請改用編輯帳號或更換 Email）', 'error');
+                    return;
+                }
+                if (e && e.code === 'auth/invalid-email') {
+                    setProfileStatus('create-account-status', 'Email 格式不正確', 'error');
+                    return;
+                }
+                if (e && e.code === 'auth/weak-password') {
+                    setProfileStatus('create-account-status', '密碼強度不足（請至少 6 碼）', 'error');
+                    return;
+                }
+                if (e && e.code === 'permission-denied') {
+                    hasDbAccess = false;
+                    setProfileStatus('create-account-status', '資料庫存取權限不足', 'error');
+                    return;
+                }
+                throw e;
+            }
+
+            const nowIso = new Date().toISOString();
+            const payload = {
+                uid,
+                email: email || (existing && existing.email) || '',
+                name: name || (existing && existing.name) || '',
+                phone: phone || (existing && existing.phone) || '',
+                lineId: lineId || (existing && existing.lineId) || '',
+                role,
+                level: ROLE_DEFS[role].level,
+                disabled: Boolean(existing && existing.disabled),
+                hidden: Boolean(existing && existing.hidden),
+                updatedAt: nowIso
+            };
+            if (!existing || !existing.createdAt) payload.createdAt = nowIso;
+            if (!createAccountEditingUid && createAccountMode === 'join') payload.approvalStatus = 'pending';
+            if (createAccountAvatarDataUrl) payload.avatarDataUrl = createAccountAvatarDataUrl;
+            if (role === '保全') {
+                const guardProfile = {
+                    idNumber: String(document.getElementById('create-account-id-number')?.value || '').trim(),
+                    birthdate: String(document.getElementById('create-account-birthdate')?.value || '').trim(),
+                    address: String(document.getElementById('create-account-address')?.value || '').trim(),
+                    bankName: String(document.getElementById('create-account-bank-name')?.value || '').trim(),
+                    bankAccount: String(document.getElementById('create-account-bank-account')?.value || '').trim(),
+                    bankHolder: String(document.getElementById('create-account-bank-holder')?.value || '').trim(),
+                    emergencyName: String(document.getElementById('create-account-emergency-name')?.value || '').trim(),
+                    emergencyRelation: String(document.getElementById('create-account-emergency-relation')?.value || '配偶').trim(),
+                    emergencyPhone: String(document.getElementById('create-account-emergency-phone')?.value || '').trim(),
+                    docs: {
+                        idFront: createAccountDocs?.idFront || '',
+                        idBack: createAccountDocs?.idBack || '',
+                        healthFront: createAccountDocs?.healthFront || '',
+                        bankbookCover: createAccountDocs?.bankbookCover || ''
+                    }
+                };
+                payload.guardProfile = guardProfile;
+            }
+
+            const ok = await safeSetUserData(uid, payload, { merge: Boolean(createAccountEditingUid) });
+            if (!ok) {
+                setProfileStatus('create-account-status', '資料庫存取權限不足', 'error');
+                return;
+            }
+
+            if (!createAccountEditingUid && createAccountMode !== 'join') {
+                try {
+                    await signOut(secondaryAuth);
+                } catch {
+                }
+            }
+
+            setProfileStatus('create-account-status', '已儲存', 'success');
+            if (createAccountMode !== 'join') {
+                accountsRoleFilter = role;
+                updateAccountsTabsUI();
+                await loadAccountsList(true);
+            }
+            window.closeCreateAccountModal();
         };
 
         window.openAccountSettings = async () => {
+            if (isPendingUser()) {
+                showPendingTip();
+                return;
+            }
             const modal = document.getElementById('accounts-modal');
             if (!modal) return;
             modal.classList.remove('hidden');
@@ -622,18 +1621,24 @@
         window.loadAccountsList = async (forceReload = false) => {
             const listEl = document.getElementById('accounts-list');
             if (!listEl) return;
+            const delayMs = forceReload ? 0 : 250;
+            if (accountsLoadTimer) clearTimeout(accountsLoadTimer);
+            const currentSeq = ++accountsLoadSeq;
 
-            if (forceReload || !Array.isArray(accountsCache)) {
+            accountsLoadTimer = setTimeout(async () => {
+                if (currentSeq !== accountsLoadSeq) return;
                 listEl.innerHTML = `
                     <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
                         <div class="w-12 h-12 border-4 border-red-100 border-t-red-600 rounded-full animate-spin mx-auto"></div>
                         <p class="mt-4 text-gray-400 font-bold tracking-tight">載入中...</p>
                     </div>
                 `;
+
+                let users = [];
                 try {
                     const q = query(usersCollectionRef(), orderBy('email'), limit(500));
                     const snap = await withDbFallback(() => getDocs(q));
-                    accountsCache = snap.docs.map((d) => d.data());
+                    users = snap.docs.map((d) => d.data());
                 } catch (e) {
                     if (e && e.code === 'permission-denied') {
                         hasDbAccess = false;
@@ -648,63 +1653,113 @@
                     }
                     throw e;
                 }
-            }
 
-            const search = (document.getElementById('accounts-search')?.value || '').trim().toLowerCase();
-            const users = Array.isArray(accountsCache) ? accountsCache : [];
-            const filteredBySearch = search
-                ? users.filter((u) => {
-                    const email = String(u?.email || '').toLowerCase();
-                    const uid = String(u?.uid || '').toLowerCase();
-                    const name = String(u?.name || '').toLowerCase();
-                    const phone = String(u?.phone || '').toLowerCase();
-                    return email.includes(search) || uid.includes(search) || name.includes(search) || phone.includes(search);
-                })
-                : users;
-            const filtered = filteredBySearch.filter((u) => {
-                const role = (u && u.role && ROLE_DEFS[u.role]) ? u.role : '保全';
-                return role === accountsRoleFilter;
-            });
+                const search = (document.getElementById('accounts-search')?.value || '').trim().toLowerCase();
+                const filteredBySearch = search
+                    ? users.filter((u) => {
+                        const email = String(u?.email || '').toLowerCase();
+                        const uid = String(u?.uid || '').toLowerCase();
+                        const name = String(u?.name || '').toLowerCase();
+                        const phone = String(u?.phone || '').toLowerCase();
+                        const lineId = String(u?.lineId || '').toLowerCase();
+                        return email.includes(search) || uid.includes(search) || name.includes(search) || phone.includes(search) || lineId.includes(search);
+                    })
+                    : users;
+                const filtered = filteredBySearch.filter((u) => {
+                    const role = (u && u.role && ROLE_DEFS[u.role]) ? u.role : '保全';
+                    return role === accountsRoleFilter && !u?.hidden;
+                });
+                accountsUsersByUid = {};
+                filteredBySearch.forEach((u) => {
+                    const uid = String(u?.uid || '').trim();
+                    if (!uid) return;
+                    accountsUsersByUid[uid] = u;
+                });
 
-            if (filtered.length === 0) {
-                listEl.innerHTML = `
-                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
-                        <i data-lucide="user-x" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
-                        <p class="text-gray-400 font-bold tracking-tight">找不到帳號</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
+                if (filtered.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                            <i data-lucide="user-x" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                            <p class="text-gray-400 font-bold tracking-tight">找不到帳號</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
 
-            listEl.innerHTML = filtered.map((u) => {
-                const role = (u && u.role && ROLE_DEFS[u.role]) ? u.role : '保全';
-                const disabled = Boolean(u && u.disabled);
-                const uid = escapeHtml(u.uid || '');
-                const email = escapeHtml(u.email || '(no email)');
-                const name = escapeHtml(u.name || '-');
-                const phone = escapeHtml(u.phone || '-');
-                return `
-                    <div class="flat-card bg-white p-5 border-none shadow-sm">
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="flex-1 min-w-0">
-                                <p class="font-black text-gray-800 truncate">${email}</p>
-                                <p class="text-xs text-gray-500 font-medium mt-1 truncate">${name}</p>
-                                <p class="text-[10px] text-gray-300 font-bold tracking-widest mt-2 truncate">${uid}</p>
-                                <div class="mt-3 flex items-center gap-2">
-                                    <span class="text-xs font-black ${disabled ? 'text-red-600' : 'text-gray-400'}">${disabled ? '已停用' : '啟用中'}</span>
-                                    <span class="text-xs font-black text-gray-300">•</span>
-                                    <span class="text-xs font-black text-gray-400">${escapeHtml(role)}</span>
-                                    <span class="text-xs font-black text-gray-300">•</span>
-                                    <span class="text-xs font-black text-gray-400 truncate">${phone}</span>
+                listEl.innerHTML = filtered.map((u) => {
+                    const uid = String(u.uid || '').trim();
+                    const email = escapeHtml(u.email || '-');
+                    const name = escapeHtml(u.name || '-');
+                    const phone = escapeHtml(u.phone || '-');
+                    const lineId = escapeHtml(u.lineId || '-');
+                    const avatar = escapeHtml(u.avatarDataUrl || '');
+                    const approvalStatus = String(u.approvalStatus || '');
+                    const canApprove = Boolean(currentUserData && currentUserData.role === '系統管理員');
+                    const badgeHtml = approvalStatus === 'pending'
+                        ? (canApprove
+                            ? `<span onclick="openApprovalModal('${uid}')" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] tracking-widest font-black cursor-pointer select-none active:scale-95 transition-transform">待審核</span>`
+                            : `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] tracking-widest font-black">待審核</span>`)
+                        : (approvalStatus === 'approved'
+                            ? (canApprove
+                                ? `<span onclick="openRevertApprovalModal('${uid}')" class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] tracking-widest font-black cursor-pointer select-none active:scale-95 transition-transform">審核通過</span>`
+                                : `<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] tracking-widest font-black">審核通過</span>`)
+                            : '');
+                    const guardDocsButtons = accountsRoleFilter === '保全' ? `
+                        <button onclick="openGuardDocsModal('${uid}','identity')" class="w-10 h-10 rounded-2xl bg-gray-100 text-gray-700 active:scale-95 transition-all flex items-center justify-center">
+                            <i data-lucide="id-card" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="openGuardDocsModal('${uid}','bankbook')" class="w-10 h-10 rounded-2xl bg-gray-100 text-gray-700 active:scale-95 transition-all flex items-center justify-center">
+                            <i data-lucide="book" class="w-5 h-5"></i>
+                        </button>
+                    ` : '';
+                    return `
+                        <div class="flat-card bg-white p-5 border-none shadow-sm">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center shrink-0">
+                                    ${avatar ? `<img src="${avatar}" class="w-full h-full object-cover" alt="大頭照">` : `<i data-lucide="user" class="w-6 h-6 text-gray-400"></i>`}
+                                </div>
+                                <div class="flex-1 min-w-0 space-y-3">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="min-w-0">
+                                            <div class="text-gray-400 text-[11px] tracking-widest">姓名</div>
+                                            <div class="flex items-center gap-2 min-w-0">
+                                                ${badgeHtml}
+                                                <div class="font-black text-gray-800 truncate min-w-0">${name}</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            ${guardDocsButtons}
+                                            <button onclick="openEditAccountModal('${uid}')" class="w-10 h-10 rounded-2xl bg-gray-100 text-gray-700 active:scale-95 transition-all flex items-center justify-center">
+                                                <i data-lucide="pencil" class="w-5 h-5"></i>
+                                            </button>
+                                            <button onclick="deleteAccountFromList('${uid}')" class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 active:scale-95 transition-all flex items-center justify-center">
+                                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div class="min-w-0">
+                                            <div class="text-gray-400 text-[11px] tracking-widest">Email</div>
+                                            <div class="text-xs font-bold text-gray-700 truncate">${email}</div>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="text-gray-400 text-[11px] tracking-widest">手機號碼</div>
+                                            <div class="text-xs font-bold text-gray-700 truncate">${phone}</div>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="text-gray-400 text-[11px] tracking-widest">Line ID</div>
+                                            <div class="text-xs font-bold text-gray-700 truncate">${lineId}</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
 
-            lucide.createIcons();
+                lucide.createIcons();
+            }, delayMs);
         };
 
         window.handleProfileLogoutFromModal = () => {
@@ -824,6 +1879,10 @@
         };
 
         window.handleChangePassword = async () => {
+            if (isPendingUser()) {
+                showPendingTip();
+                return;
+            }
             setProfileStatus('profile-password-status', '', 'muted');
             const user = auth.currentUser;
             if (!user) {
@@ -922,6 +1981,7 @@
                     document.getElementById('display-role').innerText = userData.role;
                     document.getElementById('display-email').innerText = userData.email;
                     applyProfileUI(user, currentUserData);
+                    applyNavForRole(currentUserData.role);
                     setActiveTab('ownerList');
                     loginPage.classList.add('hidden');
                     mainPage.classList.remove('hidden');
@@ -944,6 +2004,7 @@
                         document.getElementById('display-role').innerText = currentUserData.role;
                         document.getElementById('display-email').innerText = currentUserData.email;
                         applyProfileUI(user, currentUserData);
+                        applyNavForRole(currentUserData.role);
                         setActiveTab('ownerList');
                         loginPage.classList.add('hidden');
                         mainPage.classList.remove('hidden');
@@ -951,6 +2012,7 @@
                     }
                 }
             } else {
+                applyNavForRole('');
                 initLoginPreferences();
                 loginPage.classList.remove('hidden');
                 mainPage.classList.add('hidden');
@@ -1000,7 +2062,49 @@
             const disabled = Boolean(userData && userData.disabled);
             const hidden = Boolean(userData && userData.hidden);
             const name = userData && userData.name ? userData.name : '';
-            return { ...userData, role, level, email, uid, disabled, hidden, name };
+            const phone = userData && userData.phone ? userData.phone : '';
+            const lineId = userData && userData.lineId ? userData.lineId : '';
+            return { ...userData, role, level, email, uid, disabled, hidden, name, phone, lineId };
+        }
+
+        function applyNavForRole(role) {
+            const setTile = (tab, config) => {
+                const btn = document.getElementById(`nav-${tab}`);
+                if (!btn) return;
+                const labelEl = btn.querySelector('.nav-label');
+                if (labelEl) labelEl.innerText = String(config?.label || '');
+                const iconWrap = btn.querySelector('.nav-icon');
+                const icon = String(config?.icon || '').trim();
+                if (iconWrap && icon) iconWrap.innerHTML = `<i data-lucide="${escapeHtml(icon)}" class="w-6 h-6"></i>`;
+                const onClick = String(config?.onClick || '').trim();
+                if (onClick) btn.setAttribute('onclick', onClick);
+            };
+
+            const isGuard = role === '保全';
+            if (isGuard) {
+                setTile('ownerList', { label: '搜尋', icon: 'search', onClick: `openNavPageModal('搜尋', 'ownerList')` });
+                setTile('officerList', { label: '預約', icon: 'calendar-clock', onClick: `openNavPageModal('預約', 'officerList')` });
+                setTile('guardList', { label: '今日', icon: 'sun', onClick: `openNavPageModal('今日', 'guardList')` });
+                setTile('ownerAdd', { label: '案場', icon: 'building-2', onClick: `openNavPageModal('案場', 'ownerAdd')` });
+                setTile('officerAdd', { label: '任務', icon: 'briefcase', onClick: `openNavPageModal('任務', 'officerAdd')` });
+                setTile('guardAdd', { label: '紀錄', icon: 'clipboard-list', onClick: `openNavPageModal('紀錄', 'guardAdd')` });
+                setTile('ownerSettings', { label: '功能', icon: 'grid-3x3', onClick: `openNavPageModal('功能', 'ownerSettings')` });
+                setTile('officerSettings', { label: '群組', icon: 'users', onClick: `openNavPageModal('群組', 'officerSettings')` });
+                setTile('guardSettings', { label: '設定', icon: 'settings', onClick: `openNavPageModal('設定', 'guardSettings')` });
+                lucide.createIcons();
+                return;
+            }
+
+            setTile('ownerList', { label: '業主', icon: 'crown', onClick: `openNavPageModal('業主', 'ownerList')` });
+            setTile('officerList', { label: '幹部', icon: 'user-star', onClick: `openNavPageModal('幹部', 'officerList')` });
+            setTile('guardList', { label: '保全', icon: 'shield', onClick: `openNavPageModal('保全', 'guardList')` });
+            setTile('ownerAdd', { label: '案場', icon: 'building-2', onClick: `openNavPageModal('案場', 'ownerAdd')` });
+            setTile('officerAdd', { label: '任務', icon: 'briefcase', onClick: `openNavPageModal('任務', 'officerAdd')` });
+            setTile('guardAdd', { label: '廣告', icon: 'megaphone', onClick: `openNavPageModal('廣告', 'guardAdd')` });
+            setTile('ownerSettings', { label: '功能', icon: 'grid-3x3', onClick: `openNavPageModal('功能', 'ownerSettings')` });
+            setTile('officerSettings', { label: '帳號', icon: 'users', onClick: `openAccountSettings()` });
+            setTile('guardSettings', { label: '系統', icon: 'settings', onClick: `openNavPageModal('系統', 'guardSettings')` });
+            lucide.createIcons();
         }
 
         function updateNavUI() {
