@@ -1,5 +1,5 @@
-const CACHE_NAME = 'nw-pt-2026-v5';
-const PRECACHE_URLS = ['./', './index.html', './manifest.webmanifest?v=2', './icon.svg'];
+const CACHE_NAME = 'nw-pt-2026-v7';
+const PRECACHE_URLS = ['./', './index.html', './manifest.webmanifest?v=4', './icon.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
