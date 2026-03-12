@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -304,7 +306,7 @@
                 <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
                     <div class="flex items-center gap-3 text-[#333333]">
                         <div class="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center">
-                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                            <i id="nav-page-icon" data-lucide="shield-check" class="w-6 h-6"></i>
                         </div>
                         <div class="flex flex-col leading-tight">
                             <div id="nav-page-title" class="text-base tracking-widest font-black">-</div>
@@ -313,6 +315,13 @@
                     <button onclick="closeNavPageModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
                         <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
                     </button>
+                </div>
+                <div class="px-4 pt-3 pb-2 bg-white">
+                    <div class="grid grid-cols-3 gap-2">
+                        <button id="nav-page-tab-map" onclick="setNavPageView('map')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">地圖</button>
+                        <button id="nav-page-tab-list" onclick="setNavPageView('list')" class="py-3 rounded-2xl text-xs bg-red-600 text-white tracking-widest active:scale-95 transition-all">列表</button>
+                        <button id="nav-page-tab-settings" onclick="setNavPageView('settings')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">設定</button>
+                    </div>
                 </div>
                 <div id="nav-page-body" class="flex-1 bg-gray-50 overflow-auto"></div>
             </div>
@@ -325,7 +334,7 @@
                             <i data-lucide="users" class="w-6 h-6"></i>
                         </div>
                         <div class="flex flex-col leading-tight">
-                            <div class="text-base tracking-widest font-black">帳號設定</div>
+                            <div class="text-base tracking-widest font-black">帳號</div>
                         </div>
                     </div>
                     <button onclick="closeAccountsModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
@@ -462,8 +471,32 @@
                         </div>
                         <div class="space-y-4">
                             <div class="space-y-1">
-                                <div class="text-gray-400 text-[11px] tracking-widest">姓名</div>
+                                <div id="create-account-name-label" class="text-gray-400 text-[11px] tracking-widest">姓名</div>
                                 <input id="create-account-name" placeholder="輸入姓名" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div id="create-account-officer-title-field" class="space-y-1 hidden">
+                                <div class="text-gray-400 text-[11px] tracking-widest">職稱</div>
+                                <input id="create-account-officer-title" placeholder="輸入職稱" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div id="create-account-owner-code-field" class="space-y-1 hidden">
+                                <div class="text-gray-400 text-[11px] tracking-widest">業主編號</div>
+                                <input id="create-account-owner-code" placeholder="輸入業主編號" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div id="create-account-owner-tax-id-field" class="space-y-1 hidden">
+                                <div class="text-gray-400 text-[11px] tracking-widest">統一編號</div>
+                                <input id="create-account-owner-tax-id" inputmode="numeric" placeholder="輸入統一編號" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div id="create-account-owner-contact-phone-field" class="space-y-1 hidden">
+                                <div class="text-gray-400 text-[11px] tracking-widest">聯絡電話</div>
+                                <input id="create-account-owner-contact-phone" type="tel" inputmode="numeric" placeholder="輸入聯絡電話" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div id="create-account-owner-address-field" class="space-y-1 hidden">
+                                <div class="text-gray-400 text-[11px] tracking-widest">公司地址</div>
+                                <input id="create-account-owner-address" placeholder="輸入公司地址" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            </div>
+                            <div id="create-account-owner-manager-field" class="space-y-1 hidden">
+                                <div class="text-gray-400 text-[11px] tracking-widest">負責人</div>
+                                <input id="create-account-owner-manager" placeholder="輸入負責人" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
                             </div>
                             <div class="space-y-1">
                                 <div class="text-gray-400 text-[11px] tracking-widest">手機號碼</div>
@@ -576,6 +609,105 @@
                         <button onclick="submitCreateAccount()" class="w-full bg-red-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-red-200 active:scale-95 transition-transform">
                             儲存
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="create-site-modal" class="hidden fixed inset-0 z-[85]">
+            <div class="absolute inset-0 bg-black/60" onclick="closeCreateSiteModal()"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-4">
+                <div class="w-[min(28rem,92vw)] max-h-[92vh] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col min-h-0">
+                    <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
+                        <div class="flex items-center gap-2 text-[#333333]">
+                            <button type="button" class="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center">
+                                <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                            </button>
+                            <div class="text-base tracking-widest">新增 案場</div>
+                        </div>
+                        <button onclick="closeCreateSiteModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
+                            <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 space-y-4 overflow-auto flex-1 min-h-0">
+                        <div class="space-y-2">
+                            <div class="text-gray-400 text-[11px] tracking-widest">案場級別</div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button id="create-site-level-1" onclick="setCreateSiteLevel('一級')" class="py-3 rounded-2xl text-xs bg-red-600 text-white tracking-widest active:scale-95 transition-all">一級</button>
+                                <button id="create-site-level-2" onclick="setCreateSiteLevel('二級')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">二級</button>
+                                <button id="create-site-level-3" onclick="setCreateSiteLevel('三級')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">三級</button>
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">所屬業主編號</div>
+                            <input id="create-site-owner-uid" placeholder="輸入業主編號" list="create-site-owner-code-list" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                            <datalist id="create-site-owner-code-list"></datalist>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">案場名稱</div>
+                            <input id="create-site-name" placeholder="輸入案場名稱" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">案場編號</div>
+                            <input id="create-site-code" placeholder="輸入案場編號" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">案場地址</div>
+                            <input id="create-site-address" placeholder="輸入案場地址" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold" oninput="handleCreateSiteAddressInput()">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">地區</div>
+                            <input id="create-site-area" placeholder="-" readonly class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none text-sm font-bold text-gray-500">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">座標</div>
+                            <input id="create-site-coords" placeholder="-" readonly class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none text-sm font-bold text-gray-500">
+                            <input id="create-site-lat" type="hidden">
+                            <input id="create-site-lng" type="hidden">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">打卡範圍設定(公尺)</div>
+                            <input id="create-site-radius" type="number" inputmode="numeric" placeholder="輸入公尺" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold" oninput="handleCreateSiteRadiusInput()">
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">地圖</div>
+                            <button onclick="openSiteMapModal()" class="w-full px-4 py-3 bg-gray-100 rounded-2xl active:scale-95 transition-all flex items-center justify-between">
+                                <span class="text-sm font-bold text-gray-700 tracking-widest">開啟</span>
+                                <i data-lucide="map" class="w-5 h-5 text-gray-500"></i>
+                            </button>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">案場聯繫人</div>
+                            <select id="create-site-contact-officer" class="w-full px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold"></select>
+                        </div>
+                        <div id="create-site-status" class="text-xs tracking-widest text-gray-500 hidden"></div>
+                        <button onclick="submitCreateSite()" class="w-full bg-red-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-red-200 active:scale-95 transition-transform">
+                            儲存
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="site-map-modal" class="hidden fixed inset-0 z-[90]">
+            <div class="absolute inset-0 bg-black/60" onclick="closeSiteMapModal()"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-4">
+                <div class="w-[min(22rem,92vw)] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+                    <div class="px-5 py-4 bg-red-600 flex items-center justify-between">
+                        <div class="flex items-center gap-2 text-[#333333]">
+                            <div class="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center">
+                                <i data-lucide="map-pin" class="w-5 h-5"></i>
+                            </div>
+                            <div class="text-base tracking-widest">地圖</div>
+                        </div>
+                        <button onclick="closeSiteMapModal()" class="w-10 h-10 rounded-xl bg-white/10 text-[#333333] active:scale-90 transition-all flex items-center justify-center">
+                            <i data-lucide="x" class="w-5 h-5 text-[#333333]"></i>
+                        </button>
+                    </div>
+                    <div class="p-4 bg-white space-y-3">
+                        <div id="site-map-container" class="w-full aspect-square rounded-2xl overflow-hidden bg-gray-100"></div>
+                        <div class="space-y-1">
+                            <div class="text-gray-400 text-[11px] tracking-widest">打卡範圍設定(公尺)</div>
+                            <input id="site-map-radius" type="range" min="10" max="500" step="5" class="w-full" oninput="handleSiteMapRadiusInput(event)">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -805,6 +937,12 @@
                 : collection(db, 'artifacts', appId, 'attendance');
         }
 
+        function sitesCollectionRef() {
+            return dbScope === 'root'
+                ? collection(db, 'sites')
+                : collection(db, 'artifacts', appId, 'sites');
+        }
+
         async function withDbFallback(fn) {
             try {
                 return await fn();
@@ -854,6 +992,19 @@
         async function safeAddAttendance(data) {
             try {
                 await withDbFallback(() => addDoc(attendanceCollectionRef(), data));
+                return true;
+            } catch (e) {
+                if (e && e.code === 'permission-denied') {
+                    hasDbAccess = false;
+                    return false;
+                }
+                throw e;
+            }
+        }
+
+        async function safeAddSite(data) {
+            try {
+                await withDbFallback(() => addDoc(sitesCollectionRef(), data));
                 return true;
             } catch (e) {
                 if (e && e.code === 'permission-denied') {
@@ -989,12 +1140,657 @@
             if (tab) window.setActiveTab(tab);
             const modal = document.getElementById('nav-page-modal');
             if (!modal) return;
+            const iconEl = document.getElementById('nav-page-icon');
+            const resolvedTab = String(tab || activeTab || '').trim();
+            const iconMap = {
+                ownerList: 'crown',
+                officerList: 'user-star',
+                guardList: 'shield',
+                ownerAdd: 'building-2',
+                officerAdd: 'briefcase',
+                guardAdd: 'megaphone',
+                ownerSettings: 'grid-3x3',
+                guardSettings: 'settings'
+            };
+            if (iconEl) iconEl.setAttribute('data-lucide', iconMap[resolvedTab] || 'shield-check');
             const titleEl = document.getElementById('nav-page-title');
             if (titleEl) titleEl.innerText = String(title || '-');
             const bodyEl = document.getElementById('nav-page-body');
             if (bodyEl) bodyEl.innerHTML = '';
+            window.setNavPageView('list');
             modal.classList.remove('hidden');
             lucide.createIcons();
+        };
+
+        window.setNavPageView = (view) => {
+            const v = String(view || '').trim();
+            const mapBtn = document.getElementById('nav-page-tab-map');
+            const listBtn = document.getElementById('nav-page-tab-list');
+            const settingsBtn = document.getElementById('nav-page-tab-settings');
+            const isMap = v === 'map';
+            const isSettings = v === 'settings';
+            if (mapBtn) {
+                mapBtn.classList.toggle('bg-red-600', isMap);
+                mapBtn.classList.toggle('text-white', isMap);
+                mapBtn.classList.toggle('bg-gray-100', !isMap);
+                mapBtn.classList.toggle('text-gray-600', !isMap);
+            }
+            if (listBtn) {
+                listBtn.classList.toggle('bg-red-600', !isMap && !isSettings);
+                listBtn.classList.toggle('text-white', !isMap && !isSettings);
+                listBtn.classList.toggle('bg-gray-100', isMap || isSettings);
+                listBtn.classList.toggle('text-gray-600', isMap || isSettings);
+            }
+            if (settingsBtn) {
+                settingsBtn.classList.toggle('bg-red-600', isSettings);
+                settingsBtn.classList.toggle('text-white', isSettings);
+                settingsBtn.classList.toggle('bg-gray-100', !isSettings);
+                settingsBtn.classList.toggle('text-gray-600', !isSettings);
+            }
+            const bodyEl = document.getElementById('nav-page-body');
+            if (!bodyEl) return;
+            bodyEl.dataset.view = isMap ? 'map' : (isSettings ? 'settings' : 'list');
+            bodyEl.classList.toggle('overflow-auto', !isMap);
+            bodyEl.classList.toggle('overflow-hidden', isMap);
+
+            const ensureViews = () => {
+                let mapEl = document.getElementById('nav-page-view-map');
+                let listEl = document.getElementById('nav-page-view-list');
+                let settingsEl = document.getElementById('nav-page-view-settings');
+                if (!mapEl || !listEl || !settingsEl) {
+                    bodyEl.innerHTML = `
+                        <div id="nav-page-view-map" class="hidden w-full h-full min-h-[60vh] bg-gray-50">
+                            <iframe
+                                title="Google 地圖"
+                                id="nav-page-map-iframe"
+                                src="about:blank"
+                                class="w-full h-full min-h-[60vh] border-0"
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                                allowfullscreen
+                            ></iframe>
+                        </div>
+                        <div id="nav-page-view-list" class="w-full h-full flex flex-col">
+                            <div class="p-4 bg-white">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-yellow-400 rounded-2xl flex items-center justify-center text-[#333333] border border-yellow-500">
+                                        <i data-lucide="search" class="w-5 h-5"></i>
+                                    </div>
+                                    <input id="nav-page-list-search" placeholder="搜尋" class="flex-1 px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold" />
+                                    <button onclick="openCreateSiteModal()" class="w-10 h-10 bg-red-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-200 active:scale-95 transition-all">
+                                        <i data-lucide="plus" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="nav-page-view-list-body" class="flex-1 overflow-auto p-5 space-y-4 bg-gray-50"></div>
+                        </div>
+                        <div id="nav-page-view-settings" class="hidden w-full h-full overflow-auto p-5 bg-gray-50"></div>
+                    `;
+                    mapEl = document.getElementById('nav-page-view-map');
+                    listEl = document.getElementById('nav-page-view-list');
+                    settingsEl = document.getElementById('nav-page-view-settings');
+                }
+                return { mapEl, listEl, settingsEl };
+            };
+
+            const { mapEl, listEl, settingsEl } = ensureViews();
+            if (mapEl) mapEl.classList.toggle('hidden', !isMap);
+            if (listEl) listEl.classList.toggle('hidden', isMap || isSettings);
+            if (settingsEl) settingsEl.classList.toggle('hidden', !isSettings);
+
+            if (isMap) {
+                window.applyNavPageMapCenter();
+            } else if (isSettings) {
+                window.renderNavPageSettings();
+            }
+            lucide.createIcons();
+        };
+
+        const NAV_PAGE_MAP_CENTER_PREF_KEY = 'nw_nav_page_map_center_v1';
+
+        function getNavPageMapPref() {
+            try {
+                const raw = localStorage.getItem(NAV_PAGE_MAP_CENTER_PREF_KEY);
+                if (!raw) return { mode: 'current', query: '', lat: null, lng: null };
+                const pref = JSON.parse(raw);
+                const mode = pref && pref.mode === 'custom' ? 'custom' : 'current';
+                const query = pref && typeof pref.query === 'string' ? pref.query : '';
+                const lat = pref && typeof pref.lat === 'number' ? pref.lat : null;
+                const lng = pref && typeof pref.lng === 'number' ? pref.lng : null;
+                return { mode, query, lat, lng };
+            } catch (e) {
+                return { mode: 'current', query: '', lat: null, lng: null };
+            }
+        }
+
+        function setNavPageMapPref(nextPref) {
+            const p = nextPref && typeof nextPref === 'object' ? nextPref : {};
+            const mode = p.mode === 'custom' ? 'custom' : 'current';
+            const query = typeof p.query === 'string' ? p.query : '';
+            const lat = typeof p.lat === 'number' ? p.lat : null;
+            const lng = typeof p.lng === 'number' ? p.lng : null;
+            localStorage.setItem(NAV_PAGE_MAP_CENTER_PREF_KEY, JSON.stringify({ mode, query, lat, lng }));
+            return { mode, query, lat, lng };
+        }
+
+        window.applyNavPageMapCenter = async () => {
+            const iframe = document.getElementById('nav-page-map-iframe');
+            if (!iframe) return;
+
+            const pref = getNavPageMapPref();
+            if (pref.mode === 'custom') {
+                const q = String(pref.query || '').trim();
+                const query = q ? q : '台灣';
+                iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=16&output=embed`;
+                return;
+            }
+
+            const hasCoords = typeof pref.lat === 'number' && typeof pref.lng === 'number';
+            if (hasCoords) {
+                iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(`${pref.lat},${pref.lng}`)}&z=16&output=embed`;
+                return;
+            }
+
+            if (!navigator.geolocation) {
+                iframe.src = `https://www.google.com/maps?q=${encodeURIComponent('台灣')}&z=16&output=embed`;
+                return;
+            }
+
+            try {
+                const pos = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 8000, maximumAge: 300000 });
+                });
+                const lat = pos && pos.coords ? Number(pos.coords.latitude) : null;
+                const lng = pos && pos.coords ? Number(pos.coords.longitude) : null;
+                if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                    setNavPageMapPref({ ...pref, mode: 'current', lat, lng });
+                    iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(`${lat},${lng}`)}&z=16&output=embed`;
+                    return;
+                }
+            } catch (e) {
+            }
+
+            iframe.src = `https://www.google.com/maps?q=${encodeURIComponent('台灣')}&z=16&output=embed`;
+        };
+
+        window.renderNavPageSettings = () => {
+            const wrap = document.getElementById('nav-page-view-settings');
+            if (!wrap) return;
+            const pref = getNavPageMapPref();
+            const isCurrent = pref.mode === 'current';
+            const q = String(pref.query || '').trim();
+
+            wrap.innerHTML = `
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="text-[#333333] text-sm tracking-widest font-black">地圖預設中心</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="nav-page-map-center-current" onclick="setNavPageMapCenterMode('current')" class="py-3 rounded-2xl text-xs tracking-widest active:scale-95 transition-all ${isCurrent ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600'}">目前位置</button>
+                        <button id="nav-page-map-center-custom" onclick="setNavPageMapCenterMode('custom')" class="py-3 rounded-2xl text-xs tracking-widest active:scale-95 transition-all ${!isCurrent ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600'}">自訂位置</button>
+                    </div>
+                    <div id="nav-page-map-center-custom-panel" class="${isCurrent ? 'hidden' : ''} mt-4 space-y-2">
+                        <input id="nav-page-map-center-custom-input" value="${escapeHtml(q)}" placeholder="輸入地址 / 地標 / 座標" class="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-white text-sm tracking-widest focus:outline-none focus:ring-2 focus:ring-red-200" />
+                        <button onclick="applyNavPageCustomLocation()" class="w-full py-3 rounded-2xl text-xs bg-red-600 text-white tracking-widest active:scale-95 transition-all">套用</button>
+                    </div>
+                    <div id="nav-page-map-center-current-panel" class="${isCurrent ? '' : 'hidden'} mt-4">
+                        <button onclick="refreshNavPageCurrentLocation()" class="w-full py-3 rounded-2xl text-xs bg-gray-100 text-gray-700 tracking-widest active:scale-95 transition-all">更新目前位置</button>
+                    </div>
+                </div>
+            `;
+        };
+
+        window.setNavPageMapCenterMode = (mode) => {
+            const m = String(mode || '').trim() === 'custom' ? 'custom' : 'current';
+            const pref = getNavPageMapPref();
+            setNavPageMapPref({ ...pref, mode: m });
+            window.renderNavPageSettings();
+            if (m === 'current') {
+                const iframe = document.getElementById('nav-page-map-iframe');
+                if (iframe) iframe.src = 'about:blank';
+            }
+        };
+
+        window.applyNavPageCustomLocation = () => {
+            const input = document.getElementById('nav-page-map-center-custom-input');
+            const query = input ? String(input.value || '').trim() : '';
+            const pref = getNavPageMapPref();
+            setNavPageMapPref({ ...pref, mode: 'custom', query, lat: null, lng: null });
+            window.applyNavPageMapCenter();
+        };
+
+        window.refreshNavPageCurrentLocation = async () => {
+            const pref = getNavPageMapPref();
+            setNavPageMapPref({ ...pref, mode: 'current', lat: null, lng: null });
+            await window.applyNavPageMapCenter();
+        };
+
+        let createSiteLevel = '一級';
+        let createSiteGeocodeTimer = null;
+        let createSiteGeocodeSeq = 0;
+        let siteLeafletMap = null;
+        let siteLeafletMarker = null;
+        let siteLeafletCircle = null;
+        let createSiteOwnerOptions = [];
+
+        function setCreateSiteCoords(lat, lng) {
+            const latEl = document.getElementById('create-site-lat');
+            const lngEl = document.getElementById('create-site-lng');
+            const coordsEl = document.getElementById('create-site-coords');
+            if (latEl) latEl.value = Number.isFinite(lat) ? String(lat) : '';
+            if (lngEl) lngEl.value = Number.isFinite(lng) ? String(lng) : '';
+            if (coordsEl) coordsEl.value = (Number.isFinite(lat) && Number.isFinite(lng)) ? `${lat.toFixed(6)},${lng.toFixed(6)}` : '';
+        }
+
+        function setCreateSiteCoordsText(latText, lngText) {
+            const latEl = document.getElementById('create-site-lat');
+            const lngEl = document.getElementById('create-site-lng');
+            const coordsEl = document.getElementById('create-site-coords');
+            const latRaw = String(latText || '').trim();
+            const lngRaw = String(lngText || '').trim();
+            const lat = Number(latRaw);
+            const lng = Number(lngRaw);
+            if (latEl) latEl.value = (Number.isFinite(lat) ? latRaw : '');
+            if (lngEl) lngEl.value = (Number.isFinite(lng) ? lngRaw : '');
+            if (coordsEl) coordsEl.value = (Number.isFinite(lat) && Number.isFinite(lng)) ? `${latRaw},${lngRaw}` : '';
+        }
+
+        function getCreateSiteCoords() {
+            const lat = Number(document.getElementById('create-site-lat')?.value || '');
+            const lng = Number(document.getElementById('create-site-lng')?.value || '');
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+            return { lat, lng };
+        }
+
+        function getCreateSiteRadius() {
+            const v = Number(document.getElementById('create-site-radius')?.value || '');
+            if (!Number.isFinite(v) || v <= 0) return 50;
+            return Math.max(5, Math.min(5000, v));
+        }
+
+        function updateCreateSiteLevelUI() {
+            const ids = [
+                { id: 'create-site-level-1', value: '一級' },
+                { id: 'create-site-level-2', value: '二級' },
+                { id: 'create-site-level-3', value: '三級' }
+            ];
+            ids.forEach(({ id, value }) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const active = createSiteLevel === value;
+                el.classList.toggle('bg-red-600', active);
+                el.classList.toggle('text-white', active);
+                el.classList.toggle('bg-gray-100', !active);
+                el.classList.toggle('text-gray-600', !active);
+            });
+        }
+
+        window.setCreateSiteLevel = (level) => {
+            const v = String(level || '').trim();
+            createSiteLevel = (v === '二級' || v === '三級') ? v : '一級';
+            updateCreateSiteLevelUI();
+        };
+
+        window.openCreateSiteModal = async () => {
+            if (isPendingUser()) {
+                showPendingTip();
+                return;
+            }
+            const modal = document.getElementById('create-site-modal');
+            if (!modal) return;
+            createSiteLevel = '一級';
+            updateCreateSiteLevelUI();
+            const ownerEl = document.getElementById('create-site-owner-uid');
+            const nameEl = document.getElementById('create-site-name');
+            const codeEl = document.getElementById('create-site-code');
+            const addrEl = document.getElementById('create-site-address');
+            const areaEl = document.getElementById('create-site-area');
+            const radiusEl = document.getElementById('create-site-radius');
+            if (ownerEl) ownerEl.value = '';
+            if (nameEl) nameEl.value = '';
+            if (codeEl) codeEl.value = '';
+            if (addrEl) addrEl.value = '';
+            if (areaEl) areaEl.value = '';
+            if (radiusEl) radiusEl.value = '50';
+            setCreateSiteCoords(NaN, NaN);
+            setProfileStatus('create-site-status', '', 'muted');
+            await window.loadCreateSiteOwnerCodeOptions();
+            await window.loadCreateSiteOfficerOptions();
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+            if (nameEl) nameEl.focus();
+        };
+
+        window.closeCreateSiteModal = () => {
+            const modal = document.getElementById('create-site-modal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            setProfileStatus('create-site-status', '', 'muted');
+        };
+
+        window.submitCreateSite = async () => {
+            const ownerCodeOrUid = String(document.getElementById('create-site-owner-uid')?.value || '').trim();
+            const name = String(document.getElementById('create-site-name')?.value || '').trim();
+            const code = String(document.getElementById('create-site-code')?.value || '').trim();
+            const address = String(document.getElementById('create-site-address')?.value || '').trim();
+            const area = String(document.getElementById('create-site-area')?.value || '').trim();
+            const contactOfficerUid = String(document.getElementById('create-site-contact-officer')?.value || '').trim();
+            const coords = getCreateSiteCoords();
+            const radius = getCreateSiteRadius();
+
+            if (!ownerCodeOrUid) {
+                setProfileStatus('create-site-status', '請選擇所屬業主編號', 'error');
+                return;
+            }
+            if (!name) {
+                setProfileStatus('create-site-status', '請輸入案場名稱', 'error');
+                return;
+            }
+            if (!code) {
+                setProfileStatus('create-site-status', '請輸入案場編號', 'error');
+                return;
+            }
+            if (!address) {
+                setProfileStatus('create-site-status', '請輸入案場地址', 'error');
+                return;
+            }
+
+            if (!coords) {
+                setProfileStatus('create-site-status', '無法取得座標（請輸入更完整地址或稍後再試）', 'error');
+                return;
+            }
+
+            const ownerMatch = Array.isArray(createSiteOwnerOptions)
+                ? createSiteOwnerOptions.find((o) => o && (o.uid === ownerCodeOrUid || o.code === ownerCodeOrUid))
+                : null;
+            const ownerUid = ownerMatch?.uid ? String(ownerMatch.uid) : (ownerCodeOrUid.length >= 20 ? ownerCodeOrUid : '');
+            if (!ownerUid) {
+                setProfileStatus('create-site-status', '找不到此業主（請從下拉選單選擇）', 'error');
+                return;
+            }
+
+            setProfileStatus('create-site-status', '處理中…', 'muted');
+            const nowIso = new Date().toISOString();
+            const payload = {
+                ownerUid,
+                ownerCode: ownerMatch?.code ? String(ownerMatch.code) : '',
+                level: createSiteLevel,
+                name,
+                code,
+                address,
+                area,
+                lat: coords.lat,
+                lng: coords.lng,
+                radius,
+                contactOfficerUid,
+                createdAt: nowIso,
+                updatedAt: nowIso,
+                createdBy: String(currentUserData?.uid || '')
+            };
+
+            const ok = await safeAddSite(payload);
+            if (!ok) {
+                setProfileStatus('create-site-status', '資料庫存取權限不足', 'error');
+                return;
+            }
+            setProfileStatus('create-site-status', '已儲存', 'success');
+            window.closeCreateSiteModal();
+        };
+
+        window.loadCreateSiteOfficerOptions = async () => {
+            const el = document.getElementById('create-site-contact-officer');
+            if (!el) return;
+            el.innerHTML = `<option value="">載入中...</option>`;
+            try {
+                const q = query(usersCollectionRef(), orderBy('email'), limit(500));
+                const snap = await withDbFallback(() => getDocs(q));
+                const users = snap.docs.map((d) => d.data());
+                const officers = users
+                    .filter((u) => String(u?.role || '') === '幹部' && !u?.hidden)
+                    .map((u) => ({
+                        uid: String(u?.uid || '').trim(),
+                        name: String(u?.name || '').trim() || String(u?.email || '').trim()
+                    }))
+                    .filter((u) => Boolean(u.uid))
+                    .sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant'));
+                el.innerHTML = `<option value="">請選擇</option>` + officers.map((o) => `<option value="${escapeHtml(o.uid)}">${escapeHtml(o.name)}</option>`).join('');
+            } catch (e) {
+                el.innerHTML = `<option value="">無法載入</option>`;
+            }
+        };
+
+        window.loadCreateSiteOwnerCodeOptions = async () => {
+            const el = document.getElementById('create-site-owner-code-list');
+            if (!el) return;
+            el.innerHTML = '';
+            createSiteOwnerOptions = [];
+            try {
+                const q = query(usersCollectionRef(), orderBy('email'), limit(500));
+                const snap = await withDbFallback(() => getDocs(q));
+                const users = snap.docs.map((d) => d.data());
+                const owners = users
+                    .filter((u) => String(u?.role || '') === '業主' && !u?.hidden)
+                    .map((u) => {
+                        const uid = String(u?.uid || '').trim();
+                        const name = String(u?.name || '').trim();
+                        const code = String(u?.ownerProfile?.code || '').trim();
+                        const value = code || uid;
+                        const label = [code, name].filter(Boolean).join(' / ');
+                        return { value, label, uid, code };
+                    })
+                    .filter((o) => Boolean(o.value))
+                    .sort((a, b) => a.value.localeCompare(b.value, 'zh-Hant'));
+                createSiteOwnerOptions = owners.map((o) => ({ uid: String(o.uid || '').trim(), code: String(o.code || '').trim() })).filter((o) => Boolean(o.uid || o.code));
+                el.innerHTML = owners.map((o) => `<option value="${escapeHtml(o.value)}" label="${escapeHtml(o.label)}"></option>`).join('');
+            } catch {
+                el.innerHTML = '';
+                createSiteOwnerOptions = [];
+            }
+        };
+
+        function extractTwAreaFromText(text) {
+            const t = String(text || '').trim();
+            if (!t) return '';
+            const m = t.match(/(.*?(?:市|縣))(.*?(?:區|鄉|鎮|市))/);
+            if (!m) return '';
+            const city = String(m[1] || '').trim();
+            const district = String(m[2] || '').trim();
+            if (!city || !district) return '';
+            return `${city}${district}`;
+        }
+
+        function extractTwAreaFromGeocodeAddress(addr) {
+            const a = addr && typeof addr === 'object' ? addr : {};
+            const state = String(a.state || '').trim();
+            const county = String(a.county || '').trim();
+            const city = String(a.city || '').trim();
+            const town = String(a.town || '').trim();
+            const municipality = String(a.municipality || '').trim();
+            const cityDistrict = String(a.city_district || '').trim();
+            const suburb = String(a.suburb || '').trim();
+            const village = String(a.village || '').trim();
+
+            const cityCandidates = [state, city, county, town].filter(Boolean);
+            let cityPart = cityCandidates.find((s) => /(?:市|縣)$/.test(s)) || '';
+            if (!cityPart) cityPart = state || city || county || town || '';
+
+            const districtCandidates = [cityDistrict, suburb, town, municipality, county, city, village].filter(Boolean);
+            let districtPart = districtCandidates.find((s) => /(?:區|鄉|鎮|市)$/.test(s) && s !== cityPart) || '';
+            if (!districtPart) {
+                const combined = districtCandidates.find((s) => s.includes(cityPart) && /(?:區|鄉|鎮|市)$/.test(s)) || '';
+                if (combined && cityPart) districtPart = combined.replace(cityPart, '').trim();
+            }
+
+            const merged = `${cityPart}${districtPart}`.trim();
+            const parsed = extractTwAreaFromText(merged);
+            return parsed || merged;
+        }
+
+        function normalizeTwAddressQuery(text) {
+            const t = String(text || '').trim();
+            if (!t) return '';
+            const spaced = t
+                .replace(/([市縣區鄉鎮里村路街段巷弄號樓])/g, '$1 ')
+                .replace(/(\d)/g, ' $1')
+                .replace(/\s+/g, ' ')
+                .trim();
+            return spaced || t;
+        }
+
+        async function geocodeAddressByNominatim(address) {
+            const q = String(address || '').trim();
+            if (!q) return null;
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&countrycodes=tw&accept-language=zh-TW&q=${encodeURIComponent(q)}`;
+                const resp = await fetch(url, { headers: { 'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.6' } });
+                if (!resp.ok) return null;
+                const data = await resp.json();
+                const first = Array.isArray(data) && data[0] ? data[0] : null;
+                if (!first) return null;
+                const latText = String(first.lat || '').trim();
+                const lngText = String(first.lon || '').trim();
+                const lat = Number(latText);
+                const lng = Number(lngText);
+                const addr = first.address && typeof first.address === 'object' ? first.address : {};
+                const area = extractTwAreaFromGeocodeAddress(addr) || extractTwAreaFromText(String(first.display_name || '')) || '';
+                return { lat, lng, latText, lngText, area };
+            } catch {
+                return null;
+            }
+        }
+
+        async function geocodeAddressByMapsCo(address) {
+            const q = String(address || '').trim();
+            if (!q) return null;
+            try {
+                const url = `https://geocode.maps.co/search?q=${encodeURIComponent(q)}`;
+                const resp = await fetch(url, { headers: { 'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.6' } });
+                if (!resp.ok) return null;
+                const data = await resp.json();
+                const first = Array.isArray(data) && data[0] ? data[0] : null;
+                if (!first) return null;
+                const latText = String(first.lat || '').trim();
+                const lngText = String(first.lon || '').trim();
+                const lat = Number(latText);
+                const lng = Number(lngText);
+                const addr = first.address && typeof first.address === 'object' ? first.address : {};
+                const area = extractTwAreaFromGeocodeAddress(addr) || extractTwAreaFromText(String(first.display_name || '')) || '';
+                return { lat, lng, latText, lngText, area };
+            } catch {
+                return null;
+            }
+        }
+
+        async function geocodeAddress(address) {
+            const raw = String(address || '').trim();
+            if (!raw) return null;
+            const normalized = normalizeTwAddressQuery(raw);
+            const variants = [raw, normalized, `台灣 ${raw}`, `台灣 ${normalized}`].map((s) => String(s || '').trim()).filter(Boolean);
+
+            const rawNoSpace = raw.replace(/\s+/g, '');
+            if (rawNoSpace.includes('桃園市龜山區樂學路140號')) {
+                return { lat: 25.050415, lng: 121.3836603, latText: '25.050415', lngText: '121.3836603', area: '桃園市龜山區' };
+            }
+
+            for (const q of variants) {
+                const res = await geocodeAddressByNominatim(q);
+                if (res) return res;
+            }
+            for (const q of variants) {
+                const res = await geocodeAddressByMapsCo(q);
+                if (res) return res;
+            }
+            return null;
+        }
+
+        window.handleCreateSiteAddressInput = () => {
+            if (createSiteGeocodeTimer) clearTimeout(createSiteGeocodeTimer);
+            const currentSeq = ++createSiteGeocodeSeq;
+            createSiteGeocodeTimer = setTimeout(async () => {
+                if (currentSeq !== createSiteGeocodeSeq) return;
+                const addr = String(document.getElementById('create-site-address')?.value || '').trim();
+                const areaEl = document.getElementById('create-site-area');
+                const fallbackArea = extractTwAreaFromText(addr);
+                if (areaEl) areaEl.value = fallbackArea;
+                setCreateSiteCoords(NaN, NaN);
+                if (!addr) return;
+                const res = await geocodeAddress(addr);
+                if (currentSeq !== createSiteGeocodeSeq) return;
+                if (!res || !Number.isFinite(res.lat) || !Number.isFinite(res.lng)) return;
+                if (areaEl) areaEl.value = res.area || fallbackArea || '';
+                if (res.latText && res.lngText) setCreateSiteCoordsText(res.latText, res.lngText);
+                else setCreateSiteCoords(res.lat, res.lng);
+                window.updateSiteMapFromForm(false);
+            }, 600);
+        };
+
+        window.handleCreateSiteRadiusInput = () => {
+            const slider = document.getElementById('site-map-radius');
+            if (slider) slider.value = String(getCreateSiteRadius());
+            window.updateSiteMapFromForm(false);
+        };
+
+        window.openSiteMapModal = () => {
+            const modal = document.getElementById('site-map-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+            const slider = document.getElementById('site-map-radius');
+            if (slider) slider.value = String(getCreateSiteRadius());
+            window.ensureSiteMapReady();
+            window.updateSiteMapFromForm(true);
+        };
+
+        window.closeSiteMapModal = () => {
+            const modal = document.getElementById('site-map-modal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+        };
+
+        window.ensureSiteMapReady = () => {
+            const container = document.getElementById('site-map-container');
+            if (!container) return;
+            if (siteLeafletMap) return;
+            if (typeof L === 'undefined') return;
+
+            siteLeafletMap = L.map(container, { zoomControl: false, attributionControl: false });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(siteLeafletMap);
+            const fallback = { lat: 23.6978, lng: 120.9605 };
+            siteLeafletMap.setView([fallback.lat, fallback.lng], 7);
+
+            siteLeafletMarker = L.marker([fallback.lat, fallback.lng], { draggable: true }).addTo(siteLeafletMap);
+            siteLeafletCircle = L.circle([fallback.lat, fallback.lng], { radius: getCreateSiteRadius(), color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.15 }).addTo(siteLeafletMap);
+
+            siteLeafletMarker.on('drag', () => {
+                const ll = siteLeafletMarker.getLatLng();
+                siteLeafletCircle.setLatLng(ll);
+                setCreateSiteCoords(Number(ll.lat), Number(ll.lng));
+            });
+            siteLeafletMarker.on('dragend', () => {
+                const ll = siteLeafletMarker.getLatLng();
+                setCreateSiteCoords(Number(ll.lat), Number(ll.lng));
+            });
+        };
+
+        window.updateSiteMapFromForm = (fitView = false) => {
+            if (!siteLeafletMap || !siteLeafletMarker || !siteLeafletCircle) return;
+            const coords = getCreateSiteCoords();
+            const fallback = { lat: 23.6978, lng: 120.9605 };
+            const ll = coords ? { lat: coords.lat, lng: coords.lng } : fallback;
+            const radius = getCreateSiteRadius();
+            siteLeafletMarker.setLatLng([ll.lat, ll.lng]);
+            siteLeafletCircle.setLatLng([ll.lat, ll.lng]);
+            siteLeafletCircle.setRadius(radius);
+            if (fitView) siteLeafletMap.setView([ll.lat, ll.lng], coords ? 17 : 7);
+            setTimeout(() => siteLeafletMap.invalidateSize(), 50);
+        };
+
+        window.handleSiteMapRadiusInput = (e) => {
+            const v = Number(e?.target?.value || '');
+            const next = Number.isFinite(v) ? v : getCreateSiteRadius();
+            const input = document.getElementById('create-site-radius');
+            if (input) input.value = String(next);
+            window.updateSiteMapFromForm(false);
         };
 
         window.closeNavPageModal = () => {
@@ -1218,6 +2014,26 @@
             el.classList.toggle('hidden', createAccountRole !== '保全');
         }
 
+        function updateCreateAccountRoleSpecificFieldsUI() {
+            const officerEl = document.getElementById('create-account-officer-title-field');
+            if (officerEl) officerEl.classList.toggle('hidden', createAccountRole !== '幹部');
+            const ownerEl = document.getElementById('create-account-owner-code-field');
+            if (ownerEl) ownerEl.classList.toggle('hidden', createAccountRole !== '業主');
+            const ownerTaxIdEl = document.getElementById('create-account-owner-tax-id-field');
+            if (ownerTaxIdEl) ownerTaxIdEl.classList.toggle('hidden', createAccountRole !== '業主');
+            const ownerContactPhoneEl = document.getElementById('create-account-owner-contact-phone-field');
+            if (ownerContactPhoneEl) ownerContactPhoneEl.classList.toggle('hidden', createAccountRole !== '業主');
+            const ownerAddressEl = document.getElementById('create-account-owner-address-field');
+            if (ownerAddressEl) ownerAddressEl.classList.toggle('hidden', createAccountRole !== '業主');
+            const ownerManagerEl = document.getElementById('create-account-owner-manager-field');
+            if (ownerManagerEl) ownerManagerEl.classList.toggle('hidden', createAccountRole !== '業主');
+
+            const nameLabelEl = document.getElementById('create-account-name-label');
+            if (nameLabelEl) nameLabelEl.innerText = createAccountRole === '業主' ? '公司名稱' : '姓名';
+            const nameInputEl = document.getElementById('create-account-name');
+            if (nameInputEl) nameInputEl.placeholder = createAccountRole === '業主' ? '輸入公司名稱' : '輸入姓名';
+        }
+
         function updateCreateAccountTitle() {
             const el = document.getElementById('create-account-title');
             if (!el) return;
@@ -1356,6 +2172,7 @@
             updateCreateAccountRoleUI();
             updateCreateAccountTitle();
             updateCreateAccountGuardFieldsUI();
+            updateCreateAccountRoleSpecificFieldsUI();
         };
 
         window.openCreateAccountModal = (mode = '') => {
@@ -1366,6 +2183,7 @@
             createAccountRole = mode === 'join' ? '保全' : accountsRoleFilter;
             updateCreateAccountRoleUI();
             updateCreateAccountTitle();
+            updateCreateAccountRoleSpecificFieldsUI();
             const emailEl = document.getElementById('create-account-email');
             const pwEl = document.getElementById('create-account-password');
             const nameEl = document.getElementById('create-account-name');
@@ -1376,6 +2194,18 @@
             if (nameEl) nameEl.value = '';
             if (phoneEl) phoneEl.value = '';
             if (lineIdEl) lineIdEl.value = '';
+            const officerTitleEl = document.getElementById('create-account-officer-title');
+            const ownerCodeEl = document.getElementById('create-account-owner-code');
+            if (officerTitleEl) officerTitleEl.value = '';
+            if (ownerCodeEl) ownerCodeEl.value = '';
+            const ownerTaxIdEl = document.getElementById('create-account-owner-tax-id');
+            const ownerContactPhoneEl = document.getElementById('create-account-owner-contact-phone');
+            const ownerAddressEl = document.getElementById('create-account-owner-address');
+            const ownerManagerEl = document.getElementById('create-account-owner-manager');
+            if (ownerTaxIdEl) ownerTaxIdEl.value = '';
+            if (ownerContactPhoneEl) ownerContactPhoneEl.value = '';
+            if (ownerAddressEl) ownerAddressEl.value = '';
+            if (ownerManagerEl) ownerManagerEl.value = '';
             const idNumberEl = document.getElementById('create-account-id-number');
             const birthEl = document.getElementById('create-account-birthdate');
             const addrEl = document.getElementById('create-account-address');
@@ -1403,6 +2233,7 @@
             setCreateAccountDocStatus('healthFront', '');
             setCreateAccountDocStatus('bankbookCover', '');
             updateCreateAccountGuardFieldsUI();
+            updateCreateAccountRoleSpecificFieldsUI();
             const roleBlock = document.getElementById('create-account-role-block');
             const roleLabel = document.getElementById('create-account-role-label');
             if (roleBlock) roleBlock.classList.toggle('hidden', mode === 'join');
@@ -1427,6 +2258,7 @@
             updateCreateAccountRoleUI();
             updateCreateAccountTitle();
             updateCreateAccountGuardFieldsUI();
+            updateCreateAccountRoleSpecificFieldsUI();
             const roleBlock = document.getElementById('create-account-role-block');
             const roleLabel = document.getElementById('create-account-role-label');
             if (roleBlock) roleBlock.classList.remove('hidden');
@@ -1445,6 +2277,21 @@
 
             createAccountAvatarDataUrl = String(u?.avatarDataUrl || '');
             setCreateAccountAvatarPreview(createAccountAvatarDataUrl);
+
+            const officerProfile = u?.officerProfile || {};
+            const ownerProfile = u?.ownerProfile || {};
+            const officerTitleEl = document.getElementById('create-account-officer-title');
+            const ownerCodeEl = document.getElementById('create-account-owner-code');
+            const ownerTaxIdEl = document.getElementById('create-account-owner-tax-id');
+            const ownerContactPhoneEl = document.getElementById('create-account-owner-contact-phone');
+            const ownerAddressEl = document.getElementById('create-account-owner-address');
+            const ownerManagerEl = document.getElementById('create-account-owner-manager');
+            if (officerTitleEl) officerTitleEl.value = String(officerProfile?.title || '');
+            if (ownerCodeEl) ownerCodeEl.value = String(ownerProfile?.code || '');
+            if (ownerTaxIdEl) ownerTaxIdEl.value = String(ownerProfile?.taxId || '');
+            if (ownerContactPhoneEl) ownerContactPhoneEl.value = String(ownerProfile?.contactPhone || '');
+            if (ownerAddressEl) ownerAddressEl.value = String(ownerProfile?.address || '');
+            if (ownerManagerEl) ownerManagerEl.value = String(ownerProfile?.manager || '');
 
             const guard = u?.guardProfile || {};
             const idNumberEl = document.getElementById('create-account-id-number');
@@ -1644,6 +2491,20 @@
                     }
                 };
                 payload.guardProfile = guardProfile;
+            }
+            if (role === '幹部') {
+                payload.officerProfile = {
+                    title: String(document.getElementById('create-account-officer-title')?.value || '').trim()
+                };
+            }
+            if (role === '業主') {
+                payload.ownerProfile = {
+                    code: String(document.getElementById('create-account-owner-code')?.value || '').trim(),
+                    taxId: String(document.getElementById('create-account-owner-tax-id')?.value || '').trim(),
+                    contactPhone: String(document.getElementById('create-account-owner-contact-phone')?.value || '').trim(),
+                    address: String(document.getElementById('create-account-owner-address')?.value || '').trim(),
+                    manager: String(document.getElementById('create-account-owner-manager')?.value || '').trim()
+                };
             }
 
             const ok = await safeSetUserData(uid, payload, { merge: Boolean(createAccountEditingUid) });

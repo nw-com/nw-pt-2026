@@ -107,6 +107,16 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    match /artifacts/{appId}/sites/{siteId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdminArtifact(appId);
+    }
+
+    match /sites/{siteId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdminRoot();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
