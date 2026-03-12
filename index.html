@@ -1019,7 +1019,6 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errorEl = document.getElementById('login-error');
-            const rememberMe = Boolean(document.getElementById('remember-me')?.checked);
             if (!email || !password) {
                 errorEl.innerText = "請輸入 Email 與密碼";
                 errorEl.classList.remove('hidden');
@@ -1027,12 +1026,8 @@
             }
             try {
                 errorEl.classList.add('hidden');
-                await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
-                if (rememberMe) {
-                    localStorage.setItem(LOGIN_PREF_KEY, JSON.stringify({ rememberMe: true, email }));
-                } else {
-                    localStorage.setItem(LOGIN_PREF_KEY, JSON.stringify({ rememberMe: false }));
-                }
+                await setPersistence(auth, browserLocalPersistence);
+                localStorage.setItem(LOGIN_PREF_KEY, JSON.stringify({ rememberMe: true, email }));
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
                 errorEl.innerText = "驗證失敗，請檢查帳密";
@@ -1402,37 +1397,6 @@
 
         const NAV_PAGE_MAP_CENTER_PREF_KEY = 'nw_nav_page_map_center_v1';
 
-        let navPageLeafletMap = null;
-        let navPageLeafletLayer = null;
-        let navPageLeafletMarkers = null;
-        let navPageLeafletCenterMarker = null;
-
-        function ensureNavPageLeafletMap() {
-            const el = document.getElementById('nav-page-map');
-            if (!el) return null;
-
-            if (navPageLeafletMap && navPageLeafletMap.getContainer && navPageLeafletMap.getContainer() !== el) {
-                try {
-                    navPageLeafletMap.remove();
-                } catch {
-                }
-                navPageLeafletMap = null;
-                navPageLeafletLayer = null;
-                navPageLeafletMarkers = null;
-                navPageLeafletCenterMarker = null;
-            }
-
-            if (navPageLeafletMap) return navPageLeafletMap;
-
-            navPageLeafletMap = L.map(el, { zoomControl: true, attributionControl: false });
-            navPageLeafletLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19
-            });
-            navPageLeafletLayer.addTo(navPageLeafletMap);
-            navPageLeafletMarkers = L.featureGroup().addTo(navPageLeafletMap);
-            return navPageLeafletMap;
-        }
-
         function parseLatLngFromQuery(query) {
             const q = String(query || '').trim();
             if (!q) return null;
@@ -1445,49 +1409,149 @@
             return { lat, lng };
         }
 
-        async function geocodeToLatLng(query) {
-            const parsed = parseLatLngFromQuery(query);
-            if (parsed) return parsed;
-            const q = String(query || '').trim();
-            if (!q) return null;
-            try {
-                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`;
-                const res = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } });
-                if (!res.ok) return null;
-                const json = await res.json();
-                const item = Array.isArray(json) ? json[0] : null;
-                const lat = item ? Number(item.lat) : NaN;
-                const lng = item ? Number(item.lon) : NaN;
-                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-                if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
-                return { lat, lng };
-            } catch {
-                return null;
+        let navPageLeafletMap = null;
+        let navPageLeafletLayer = null;
+        let navPageLeafletMarkers = null;
+        let navPageLeafletCenterMarker = null;
+        let navPageLeafletRouteLayer = null;
+        let navPageLeafletRouteInfoControl = null;
+        let navPageLeafletHasInitView = false;
+
+        function ensureNavPageLeafletMap() {
+            const el = document.getElementById('nav-page-map');
+            if (!el) return null;
+
+            if (navPageLeafletMap && navPageLeafletMap.getContainer && navPageLeafletMap.getContainer() !== el) {
+                try { navPageLeafletMap.remove(); } catch {}
+                navPageLeafletMap = null;
+                navPageLeafletLayer = null;
+                navPageLeafletMarkers = null;
+                navPageLeafletCenterMarker = null;
             }
+
+            if (navPageLeafletMap) return navPageLeafletMap;
+
+            navPageLeafletMap = L.map(el, { zoomControl: true, attributionControl: false });
+            navPageLeafletLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
+            navPageLeafletLayer.addTo(navPageLeafletMap);
+            navPageLeafletMarkers = L.featureGroup().addTo(navPageLeafletMap);
+            navPageLeafletRouteLayer = L.featureGroup().addTo(navPageLeafletMap);
+            navPageLeafletHasInitView = false;
+            return navPageLeafletMap;
         }
 
-        async function renderNavPageMapWithSites(center, forceReload = false) {
-            const map = ensureNavPageLeafletMap();
+        function getCurrentUserAvatarUrl() {
+            const uid = String(currentUserData?.uid || auth?.currentUser?.uid || '').trim();
+            let localAvatar = '';
+            try {
+                localAvatar = uid ? (localStorage.getItem(`${PROFILE_AVATAR_KEY_PREFIX}${uid}`) || '') : '';
+            } catch {
+                localAvatar = '';
+            }
+            const avatarDataUrl = String(currentUserData?.avatarDataUrl || '').trim();
+            const photoURL = String(auth?.currentUser?.photoURL || currentUserData?.photoURL || '').trim();
+            return avatarDataUrl || localAvatar || photoURL;
+        }
+
+        function loadImage(url) {
+            return new Promise((resolve) => {
+                const src = String(url || '').trim();
+                if (!src) {
+                    resolve(null);
+                    return;
+                }
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = () => resolve(null);
+                img.src = src;
+            });
+        }
+
+        async function buildAvatarIconDataUrl(avatarUrl) {
+            const img = await loadImage(avatarUrl);
+            const size = 72;
+            const border = 6;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return '';
+
+            ctx.clearRect(0, 0, size, size);
+            const cx = size / 2;
+            const cy = size / 2;
+            const r = (size / 2) - border;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.clip();
+
+            if (img) {
+                const iw = img.naturalWidth || img.width || 1;
+                const ih = img.naturalHeight || img.height || 1;
+                const scale = Math.max((r * 2) / iw, (r * 2) / ih);
+                const dw = iw * scale;
+                const dh = ih * scale;
+                const dx = cx - (dw / 2);
+                const dy = cy - (dh / 2);
+                ctx.drawImage(img, dx, dy, dw, dh);
+            } else {
+                ctx.fillStyle = '#f3f4f6';
+                ctx.fillRect(0, 0, size, size);
+            }
+            ctx.restore();
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.lineWidth = border;
+            ctx.strokeStyle = '#FF7F7F';
+            ctx.stroke();
+
+            return canvas.toDataURL('image/png');
+        }
+
+        function geocodeWithGoogle(query) {
+            return new Promise((resolve) => {
+                const q = String(query || '').trim();
+                const parsed = parseLatLngFromQuery(q);
+                if (parsed) {
+                    resolve(parsed);
+                    return;
+                }
+                if (!q || !(window.google && window.google.maps && window.google.maps.Geocoder)) {
+                    resolve(null);
+                    return;
+                }
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ address: q }, (results, status) => {
+                    if (status !== 'OK' || !Array.isArray(results) || results.length === 0) {
+                        resolve(null);
+                        return;
+                    }
+                    const loc = results[0]?.geometry?.location;
+                    const lat = loc ? Number(loc.lat()) : NaN;
+                    const lng = loc ? Number(loc.lng()) : NaN;
+                    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+                        resolve(null);
+                        return;
+                    }
+                    resolve({ lat, lng });
+                });
+            });
+        }
+
+        async function renderNavPageGoogleMapWithSites(center, forceReload = false) {
+            const map = await ensureNavPageGoogleMap();
             if (!map) return;
 
             const viewWrap = document.getElementById('nav-page-view-map');
             if (!viewWrap || viewWrap.classList.contains('hidden')) return;
 
-            setTimeout(() => {
-                try {
-                    map.invalidateSize();
-                } catch {
-                }
-            }, 0);
-
-            if (navPageLeafletMarkers) navPageLeafletMarkers.clearLayers();
-            if (navPageLeafletCenterMarker) {
-                try {
-                    navPageLeafletCenterMarker.remove();
-                } catch {
-                }
-                navPageLeafletCenterMarker = null;
-            }
+            clearNavPageGoogleMarkers();
 
             const centerLat = Number(center?.lat);
             const centerLng = Number(center?.lng);
@@ -1495,14 +1559,24 @@
             const defaultCenter = { lat: 23.69781, lng: 120.960515 };
             const centerResolved = hasCenter ? { lat: centerLat, lng: centerLng } : defaultCenter;
 
-            navPageLeafletCenterMarker = L.circleMarker([centerResolved.lat, centerResolved.lng], {
-                radius: 7,
-                color: '#FF7F7F',
-                weight: 3,
-                fillColor: '#FF7F7F',
-                fillOpacity: 0.18
-            }).addTo(map);
-            navPageLeafletCenterMarker.bindPopup('預設中心點');
+            map.setCenter(centerResolved);
+            map.setZoom(14);
+
+            const avatarUrl = getCurrentUserAvatarUrl();
+            const avatarIconUrl = await buildAvatarIconDataUrl(avatarUrl);
+            const meMarker = new google.maps.Marker({
+                position: centerResolved,
+                map,
+                title: '我的位置',
+                icon: avatarIconUrl
+                    ? {
+                        url: avatarIconUrl,
+                        scaledSize: new google.maps.Size(48, 48),
+                        anchor: new google.maps.Point(24, 24)
+                    }
+                    : undefined
+            });
+            navPageGMarkers.push(meMarker);
 
             let sites = [];
             try {
@@ -1511,32 +1585,47 @@
                 sites = [];
             }
 
-            const coords = [];
+            const bounds = new google.maps.LatLngBounds();
+            bounds.extend(centerResolved);
+
             sites.forEach((s) => {
                 const lat = Number(s?.lat);
                 const lng = Number(s?.lng);
                 if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-                coords.push([lat, lng]);
+                const pos = { lat, lng };
+                bounds.extend(pos);
+
                 const name = escapeHtml(String(s?.name || '案場'));
                 const address = escapeHtml(String(s?.address || ''));
                 const subtitle = escapeHtml(formatSiteSubtitle(s) || '');
-                const popup = `
-                    <div class="text-sm tracking-widest">
-                        <div class="font-black text-gray-900">${name}</div>
-                        ${subtitle ? `<div class="text-[11px] text-gray-500 mt-1">${subtitle}</div>` : ''}
-                        ${address ? `<div class="text-[11px] text-gray-600 mt-1">${address}</div>` : ''}
-                    </div>
-                `;
-                const m = L.marker([lat, lng]).bindPopup(popup);
-                if (navPageLeafletMarkers) navPageLeafletMarkers.addLayer(m);
+                const info = new google.maps.InfoWindow({
+                    content: `
+                        <div class="text-sm tracking-widest">
+                            <div class="font-black text-gray-900">${name}</div>
+                            ${subtitle ? `<div class="text-[11px] text-gray-500 mt-1">${subtitle}</div>` : ''}
+                            ${address ? `<div class="text-[11px] text-gray-600 mt-1">${address}</div>` : ''}
+                        </div>
+                    `
+                });
+                const marker = new google.maps.Marker({
+                    position: pos,
+                    map,
+                    title: String(s?.name || '案場'),
+                    icon: {
+                        url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                        scaledSize: new google.maps.Size(34, 34)
+                    }
+                });
+                marker.addListener('click', () => info.open({ anchor: marker, map }));
+                navPageGMarkers.push(marker);
             });
 
-            if (coords.length > 0) {
-                let bounds = L.latLngBounds(coords);
-                bounds = bounds.extend([centerResolved.lat, centerResolved.lng]);
-                map.fitBounds(bounds, { padding: [28, 28] });
-            } else {
-                map.setView([centerResolved.lat, centerResolved.lng], 15);
+            if (!bounds.isEmpty()) {
+                map.fitBounds(bounds, 56);
+                google.maps.event.addListenerOnce(map, 'idle', () => {
+                    const z = map.getZoom();
+                    if (typeof z === 'number' && z > 17) map.setZoom(17);
+                });
             }
         }
 
@@ -1563,6 +1652,27 @@
             const lng = typeof p.lng === 'number' ? p.lng : null;
             localStorage.setItem(NAV_PAGE_MAP_CENTER_PREF_KEY, JSON.stringify({ mode, query, lat, lng }));
             return { mode, query, lat, lng };
+        }
+
+        async function geocodeToLatLng(query) {
+            const parsed = parseLatLngFromQuery(query);
+            if (parsed) return parsed;
+            const q = String(query || '').trim();
+            if (!q) return null;
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`;
+                const res = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } });
+                if (!res.ok) return null;
+                const json = await res.json();
+                const item = Array.isArray(json) ? json[0] : null;
+                const lat = item ? Number(item.lat) : NaN;
+                const lng = item ? Number(item.lon) : NaN;
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+                if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+                return { lat, lng };
+            } catch {
+                return null;
+            }
         }
 
         window.applyNavPageMapCenter = async () => {
@@ -1645,8 +1755,7 @@
             const input = document.getElementById('nav-page-map-center-custom-input');
             const query = input ? String(input.value || '').trim() : '';
             const pref = getNavPageMapPref();
-            const geo = await geocodeToLatLng(query);
-            setNavPageMapPref({ ...pref, mode: 'custom', query, lat: geo ? geo.lat : null, lng: geo ? geo.lng : null });
+            setNavPageMapPref({ ...pref, mode: 'custom', query, lat: null, lng: null });
             await window.applyNavPageMapCenter();
         };
 
@@ -1655,6 +1764,158 @@
             setNavPageMapPref({ ...pref, mode: 'current', lat: null, lng: null });
             await window.applyNavPageMapCenter();
         };
+
+        async function renderNavPageMapWithSites(center, forceReload = false) {
+            const map = ensureNavPageLeafletMap();
+            if (!map) return;
+
+            const viewWrap = document.getElementById('nav-page-view-map');
+            if (!viewWrap || viewWrap.classList.contains('hidden')) return;
+
+            setTimeout(() => { try { map.invalidateSize(); } catch {} }, 0);
+
+            if (navPageLeafletMarkers) navPageLeafletMarkers.clearLayers();
+            if (navPageLeafletCenterMarker) {
+                try { navPageLeafletCenterMarker.remove(); } catch {}
+                navPageLeafletCenterMarker = null;
+            }
+
+            const centerLat = Number(center?.lat);
+            const centerLng = Number(center?.lng);
+            const hasCenter = Number.isFinite(centerLat) && Number.isFinite(centerLng);
+            const defaultCenter = { lat: 23.69781, lng: 120.960515 };
+            const centerResolved = hasCenter ? { lat: centerLat, lng: centerLng } : defaultCenter;
+
+            const avatarUrl = getCurrentUserAvatarUrl();
+            const avatarIconUrl = await buildAvatarIconDataUrl(avatarUrl);
+            const meIcon = avatarIconUrl
+                ? L.icon({
+                    iconUrl: avatarIconUrl,
+                    iconSize: [48, 48],
+                    iconAnchor: [24, 24],
+                    popupAnchor: [0, -24]
+                })
+                : L.divIcon({
+                    html: '<div style="width:14px;height:14px;border:4px solid #FF7F7F;border-radius:50%;background:#fff;"></div>',
+                    className: 'leaflet-div-avatar',
+                    iconSize: [22, 22],
+                    iconAnchor: [11, 11]
+                });
+            navPageLeafletCenterMarker = L.marker([centerResolved.lat, centerResolved.lng], { icon: meIcon }).addTo(map);
+
+            let sites = [];
+            try { sites = await loadNavPageSites(forceReload); } catch { sites = []; }
+
+            const coords = [];
+            sites.forEach((s) => {
+                const lat = Number(s?.lat);
+                const lng = Number(s?.lng);
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+                coords.push([lat, lng]);
+                const name = escapeHtml(String(s?.name || '案場'));
+                const address = escapeHtml(String(s?.address || ''));
+                const subtitle = escapeHtml(formatSiteSubtitle(s) || '');
+                const popup = `
+                    <div class="text-sm tracking-widest">
+                        <div class="font-black text-gray-900">${name}</div>
+                        ${subtitle ? `<div class="text-[11px] text-gray-500 mt-1">${subtitle}</div>` : ''}
+                        ${address ? `<div class="text-[11px] text-gray-600 mt-1">${address}</div>` : ''}
+                        <div class="mt-2">
+                            <button onclick="navRouteToSite(${lat},${lng})" class="px-3 py-2 rounded-xl bg-red-600 text-white text-[11px] tracking-widest active:scale-95 transition-all">路線</button>
+                        </div>
+                    </div>
+                `;
+                const redIcon = L.icon({
+                    iconUrl: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                    iconSize: [34, 34],
+                    iconAnchor: [17, 17],
+                    popupAnchor: [0, -17]
+                });
+                const marker = L.marker([lat, lng], { icon: redIcon }).bindPopup(popup);
+                if (navPageLeafletMarkers) navPageLeafletMarkers.addLayer(marker);
+            });
+
+            if (!navPageLeafletHasInitView) {
+                map.setView([centerResolved.lat, centerResolved.lng], 15);
+                navPageLeafletHasInitView = true;
+            }
+        }
+
+        function ensureRouteInfoControl() {
+            const map = ensureNavPageLeafletMap();
+            if (!map) return null;
+            if (navPageLeafletRouteInfoControl) return navPageLeafletRouteInfoControl;
+            const ctrl = L.control({ position: 'bottomleft' });
+            ctrl.onAdd = function () {
+                const div = L.DomUtil.create('div', 'route-info');
+                div.className = 'flat-card bg-white/90 backdrop-blur px-3 py-2 rounded-xl text-[11px] text-gray-700 tracking-widest shadow-sm border border-gray-100';
+                div.innerHTML = '';
+                return div;
+            };
+            ctrl.addTo(map);
+            navPageLeafletRouteInfoControl = ctrl;
+            return ctrl;
+        }
+
+        function setRouteInfoText(text) {
+            const ctrl = ensureRouteInfoControl();
+            if (!ctrl) return;
+            const map = ensureNavPageLeafletMap();
+            const panes = map ? map.getContainer().getElementsByClassName('route-info') : [];
+            const el = panes && panes[0] ? panes[0] : null;
+            if (!el) return;
+            el.innerHTML = text || '';
+        }
+
+        function clearRouteLayer() {
+            if (navPageLeafletRouteLayer) {
+                try { navPageLeafletRouteLayer.clearLayers(); } catch {}
+            }
+            setRouteInfoText('');
+        }
+
+        function formatDuration(sec) {
+            const s = Math.max(0, Math.floor(Number(sec || 0)));
+            const h = Math.floor(s / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            if (h > 0) return `${h} 小時 ${m} 分鐘`;
+            return `${m} 分鐘`;
+        }
+
+        async function fetchDrivingRoute(origin, dest) {
+            const url = `https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${dest.lng},${dest.lat}?overview=full&geometries=geojson`;
+            const res = await fetch(url, { method: 'GET' });
+            if (!res.ok) return null;
+            const json = await res.json();
+            const r = Array.isArray(json.routes) ? json.routes[0] : null;
+            if (!r || !r.geometry) return null;
+            return { geometry: r.geometry, distance: Number(r.distance || 0), duration: Number(r.duration || 0) };
+        }
+
+        async function navRouteToSite(lat, lng) {
+            const map = ensureNavPageLeafletMap();
+            if (!map) return;
+            const pref = getNavPageMapPref();
+            let origin = null;
+            try {
+                const pos = await new Promise((resolve) => {
+                    if (!navigator.geolocation) { resolve(null); return; }
+                    navigator.geolocation.getCurrentPosition((p) => resolve(p), () => resolve(null), { enableHighAccuracy: true, timeout: 5000, maximumAge: 300000 });
+                });
+                if (pos && pos.coords) origin = { lat: Number(pos.coords.latitude), lng: Number(pos.coords.longitude) };
+            } catch {}
+            if (!origin && Number.isFinite(pref.lat) && Number.isFinite(pref.lng)) origin = { lat: Number(pref.lat), lng: Number(pref.lng) };
+            if (!origin) origin = { lat: 23.69781, lng: 120.960515 };
+            const dest = { lat: Number(lat), lng: Number(lng) };
+            clearRouteLayer();
+            const route = await fetchDrivingRoute(origin, dest);
+            if (!route) return;
+            const line = L.geoJSON(route.geometry, { style: { color: '#FF4D4F', weight: 5, opacity: 0.9 } });
+            if (navPageLeafletRouteLayer) navPageLeafletRouteLayer.addLayer(line);
+            const km = (route.distance / 1000).toFixed(2);
+            const dur = formatDuration(route.duration);
+            setRouteInfoText(`距離 ${km} 公里 · 時程 ${dur}`);
+        }
 
         let createSiteLevel = '一級';
         let createSiteGeocodeTimer = null;
@@ -3254,11 +3515,13 @@
 
             try {
                 const raw = localStorage.getItem(LOGIN_PREF_KEY);
-                if (!raw) return;
+                if (!raw) {
+                    rememberEl.checked = true;
+                    return;
+                }
                 const pref = JSON.parse(raw);
-                const rememberMe = Boolean(pref && pref.rememberMe);
-                rememberEl.checked = rememberMe;
-                if (rememberMe && pref && typeof pref.email === 'string') {
+                rememberEl.checked = true;
+                if (pref && typeof pref.email === 'string') {
                     emailEl.value = pref.email;
                 }
             } catch (e) {
