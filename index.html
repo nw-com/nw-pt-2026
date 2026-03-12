@@ -1158,6 +1158,7 @@
             const bodyEl = document.getElementById('nav-page-body');
             if (bodyEl) bodyEl.innerHTML = '';
             window.setNavPageView('list');
+            if (typeof window.renderNavPageList === 'function') window.renderNavPageList(true);
             modal.classList.remove('hidden');
             lucide.createIcons();
         };
@@ -1200,15 +1201,7 @@
                 if (!mapEl || !listEl || !settingsEl) {
                     bodyEl.innerHTML = `
                         <div id="nav-page-view-map" class="hidden w-full h-full min-h-[60vh] bg-gray-50">
-                            <iframe
-                                title="Google 地圖"
-                                id="nav-page-map-iframe"
-                                src="about:blank"
-                                class="w-full h-full min-h-[60vh] border-0"
-                                loading="lazy"
-                                referrerpolicy="no-referrer-when-downgrade"
-                                allowfullscreen
-                            ></iframe>
+                            <div id="nav-page-map" class="w-full h-full min-h-[60vh]"></div>
                         </div>
                         <div id="nav-page-view-list" class="w-full h-full flex flex-col">
                             <div class="p-4 bg-white">
@@ -1216,7 +1209,7 @@
                                     <div class="w-10 h-10 bg-yellow-400 rounded-2xl flex items-center justify-center text-[#333333] border border-yellow-500">
                                         <i data-lucide="search" class="w-5 h-5"></i>
                                     </div>
-                                    <input id="nav-page-list-search" placeholder="搜尋" class="flex-1 px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold" />
+                                    <input id="nav-page-list-search" placeholder="搜尋" class="flex-1 px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold" oninput="renderNavPageList()" />
                                     <button onclick="openCreateSiteModal()" class="w-10 h-10 bg-red-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-200 active:scale-95 transition-all">
                                         <i data-lucide="plus" class="w-5 h-5"></i>
                                     </button>
@@ -1242,11 +1235,310 @@
                 window.applyNavPageMapCenter();
             } else if (isSettings) {
                 window.renderNavPageSettings();
+            } else if (typeof window.renderNavPageList === 'function') {
+                window.renderNavPageList();
             }
             lucide.createIcons();
         };
 
+        let navPageSitesCache = null;
+        let navPageSitesLoading = false;
+
+        async function loadNavPageSites(forceReload = false) {
+            if (!forceReload && Array.isArray(navPageSitesCache)) return navPageSitesCache;
+            if (navPageSitesLoading) return Array.isArray(navPageSitesCache) ? navPageSitesCache : [];
+            navPageSitesLoading = true;
+            try {
+                const q = query(sitesCollectionRef(), orderBy('createdAt', 'desc'), limit(200));
+                const snap = await withDbFallback(() => getDocs(q));
+                navPageSitesCache = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+                return navPageSitesCache;
+            } catch (e) {
+                if (e && e.code === 'permission-denied') {
+                    hasDbAccess = false;
+                    navPageSitesCache = [];
+                    return [];
+                }
+                throw e;
+            } finally {
+                navPageSitesLoading = false;
+            }
+        }
+
+        function normalizeSearchText(text) {
+            return String(text || '').trim().toLowerCase();
+        }
+
+        function formatSiteSubtitle(site) {
+            const parts = [
+                String(site?.level || '').trim(),
+                String(site?.ownerCode || '').trim(),
+                String(site?.area || '').trim()
+            ].filter(Boolean);
+            return parts.join(' / ');
+        }
+
+        function renderNavPageSiteCard(site) {
+            const name = escapeHtml(String(site?.name || '-'));
+            const code = escapeHtml(String(site?.code || '-'));
+            const address = escapeHtml(String(site?.address || '-'));
+            const subtitle = escapeHtml(formatSiteSubtitle(site) || '案場');
+            const ownerUid = escapeHtml(String(site?.ownerUid || ''));
+            const lat = Number(site?.lat);
+            const lng = Number(site?.lng);
+            const hasCoords = Number.isFinite(lat) && Number.isFinite(lng);
+            const mapsHref = hasCoords ? `https://www.google.com/maps?q=${encodeURIComponent(`${lat},${lng}`)}` : '';
+
+            return `
+                <div class="flat-card bg-white p-5 border-none shadow-sm">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <div class="text-gray-900 text-base tracking-widest font-black truncate">${name}</div>
+                            <div class="mt-1 text-gray-400 text-[11px] tracking-widest truncate">${subtitle}</div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            ${mapsHref ? `
+                                <a href="${escapeHtml(mapsHref)}" target="_blank" rel="noreferrer" class="w-10 h-10 rounded-2xl bg-gray-100 text-gray-700 active:scale-95 transition-all flex items-center justify-center">
+                                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                                </a>
+                            ` : `
+                                <div class="w-10 h-10 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center">
+                                    <i data-lucide="map-pin-off" class="w-5 h-5"></i>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                    <div class="mt-4 grid grid-cols-3 gap-3">
+                        <div class="text-gray-400 text-[11px] tracking-widest truncate">案場編號</div>
+                        <div class="text-gray-400 text-[11px] tracking-widest truncate">業主</div>
+                        <div class="text-gray-400 text-[11px] tracking-widest truncate">地址</div>
+                    </div>
+                    <div class="mt-1 grid grid-cols-3 gap-3">
+                        <div class="text-xs font-bold text-gray-700 truncate min-w-0">${code}</div>
+                        <div class="text-xs font-bold text-gray-700 truncate min-w-0">${ownerUid || '-'}</div>
+                        <div class="text-xs font-bold text-gray-700 truncate min-w-0">${address}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.renderNavPageList = async (forceReload = false) => {
+            const body = document.getElementById('nav-page-view-list-body');
+            if (!body) return;
+            const tab = String(activeTab || '').trim();
+            if (tab !== 'ownerAdd') {
+                body.innerHTML = `
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <i data-lucide="layers" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                        <p class="text-gray-400 font-bold tracking-tight">此頁面尚未建立列表內容</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            body.innerHTML = `
+                <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                    <div class="w-12 h-12 border-4 border-red-100 border-t-red-600 rounded-full animate-spin mx-auto"></div>
+                    <p class="mt-4 text-gray-400 font-bold tracking-tight">載入案場中...</p>
+                </div>
+            `;
+
+            let sites = [];
+            try {
+                sites = await loadNavPageSites(forceReload);
+            } catch {
+                body.innerHTML = `
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <i data-lucide="shield-alert" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                        <p class="text-gray-400 font-bold tracking-tight">無法載入案場資料</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            const search = normalizeSearchText(document.getElementById('nav-page-list-search')?.value || '');
+            const filtered = search
+                ? sites.filter((s) => {
+                    const fields = [
+                        s?.name,
+                        s?.code,
+                        s?.address,
+                        s?.area,
+                        s?.ownerCode,
+                        s?.ownerUid,
+                        s?.level
+                    ].map(normalizeSearchText);
+                    return fields.some((v) => v.includes(search));
+                })
+                : sites;
+
+            if (!hasDbAccess) {
+                body.innerHTML = `
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <i data-lucide="shield-alert" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                        <p class="text-gray-400 font-bold tracking-tight">資料庫存取權限不足，無法載入案場清單</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            if (filtered.length === 0) {
+                body.innerHTML = `
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <i data-lucide="building-2" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                        <p class="text-gray-400 font-bold tracking-tight">找不到案場</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            body.innerHTML = filtered.map(renderNavPageSiteCard).join('');
+            lucide.createIcons();
+        };
+
         const NAV_PAGE_MAP_CENTER_PREF_KEY = 'nw_nav_page_map_center_v1';
+
+        let navPageLeafletMap = null;
+        let navPageLeafletLayer = null;
+        let navPageLeafletMarkers = null;
+        let navPageLeafletCenterMarker = null;
+
+        function ensureNavPageLeafletMap() {
+            const el = document.getElementById('nav-page-map');
+            if (!el) return null;
+
+            if (navPageLeafletMap && navPageLeafletMap.getContainer && navPageLeafletMap.getContainer() !== el) {
+                try {
+                    navPageLeafletMap.remove();
+                } catch {
+                }
+                navPageLeafletMap = null;
+                navPageLeafletLayer = null;
+                navPageLeafletMarkers = null;
+                navPageLeafletCenterMarker = null;
+            }
+
+            if (navPageLeafletMap) return navPageLeafletMap;
+
+            navPageLeafletMap = L.map(el, { zoomControl: true, attributionControl: false });
+            navPageLeafletLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+            });
+            navPageLeafletLayer.addTo(navPageLeafletMap);
+            navPageLeafletMarkers = L.featureGroup().addTo(navPageLeafletMap);
+            return navPageLeafletMap;
+        }
+
+        function parseLatLngFromQuery(query) {
+            const q = String(query || '').trim();
+            if (!q) return null;
+            const m = q.match(/(-?\d+(?:\.\d+)?)\s*[,，\s]\s*(-?\d+(?:\.\d+)?)/);
+            if (!m) return null;
+            const lat = Number(m[1]);
+            const lng = Number(m[2]);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+            if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+            return { lat, lng };
+        }
+
+        async function geocodeToLatLng(query) {
+            const parsed = parseLatLngFromQuery(query);
+            if (parsed) return parsed;
+            const q = String(query || '').trim();
+            if (!q) return null;
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`;
+                const res = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } });
+                if (!res.ok) return null;
+                const json = await res.json();
+                const item = Array.isArray(json) ? json[0] : null;
+                const lat = item ? Number(item.lat) : NaN;
+                const lng = item ? Number(item.lon) : NaN;
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+                if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+                return { lat, lng };
+            } catch {
+                return null;
+            }
+        }
+
+        async function renderNavPageMapWithSites(center, forceReload = false) {
+            const map = ensureNavPageLeafletMap();
+            if (!map) return;
+
+            const viewWrap = document.getElementById('nav-page-view-map');
+            if (!viewWrap || viewWrap.classList.contains('hidden')) return;
+
+            setTimeout(() => {
+                try {
+                    map.invalidateSize();
+                } catch {
+                }
+            }, 0);
+
+            if (navPageLeafletMarkers) navPageLeafletMarkers.clearLayers();
+            if (navPageLeafletCenterMarker) {
+                try {
+                    navPageLeafletCenterMarker.remove();
+                } catch {
+                }
+                navPageLeafletCenterMarker = null;
+            }
+
+            const centerLat = Number(center?.lat);
+            const centerLng = Number(center?.lng);
+            const hasCenter = Number.isFinite(centerLat) && Number.isFinite(centerLng);
+            const defaultCenter = { lat: 23.69781, lng: 120.960515 };
+            const centerResolved = hasCenter ? { lat: centerLat, lng: centerLng } : defaultCenter;
+
+            navPageLeafletCenterMarker = L.circleMarker([centerResolved.lat, centerResolved.lng], {
+                radius: 7,
+                color: '#FF7F7F',
+                weight: 3,
+                fillColor: '#FF7F7F',
+                fillOpacity: 0.18
+            }).addTo(map);
+            navPageLeafletCenterMarker.bindPopup('預設中心點');
+
+            let sites = [];
+            try {
+                sites = await loadNavPageSites(forceReload);
+            } catch {
+                sites = [];
+            }
+
+            const coords = [];
+            sites.forEach((s) => {
+                const lat = Number(s?.lat);
+                const lng = Number(s?.lng);
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+                coords.push([lat, lng]);
+                const name = escapeHtml(String(s?.name || '案場'));
+                const address = escapeHtml(String(s?.address || ''));
+                const subtitle = escapeHtml(formatSiteSubtitle(s) || '');
+                const popup = `
+                    <div class="text-sm tracking-widest">
+                        <div class="font-black text-gray-900">${name}</div>
+                        ${subtitle ? `<div class="text-[11px] text-gray-500 mt-1">${subtitle}</div>` : ''}
+                        ${address ? `<div class="text-[11px] text-gray-600 mt-1">${address}</div>` : ''}
+                    </div>
+                `;
+                const m = L.marker([lat, lng]).bindPopup(popup);
+                if (navPageLeafletMarkers) navPageLeafletMarkers.addLayer(m);
+            });
+
+            if (coords.length > 0) {
+                let bounds = L.latLngBounds(coords);
+                bounds = bounds.extend([centerResolved.lat, centerResolved.lng]);
+                map.fitBounds(bounds, { padding: [28, 28] });
+            } else {
+                map.setView([centerResolved.lat, centerResolved.lng], 15);
+            }
+        }
 
         function getNavPageMapPref() {
             try {
@@ -1274,25 +1566,27 @@
         }
 
         window.applyNavPageMapCenter = async () => {
-            const iframe = document.getElementById('nav-page-map-iframe');
-            if (!iframe) return;
-
             const pref = getNavPageMapPref();
-            if (pref.mode === 'custom') {
-                const q = String(pref.query || '').trim();
-                const query = q ? q : '台灣';
-                iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=16&output=embed`;
+            const hasCoords = Number.isFinite(pref.lat) && Number.isFinite(pref.lng);
+            if (hasCoords) {
+                await renderNavPageMapWithSites({ lat: pref.lat, lng: pref.lng });
                 return;
             }
 
-            const hasCoords = typeof pref.lat === 'number' && typeof pref.lng === 'number';
-            if (hasCoords) {
-                iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(`${pref.lat},${pref.lng}`)}&z=16&output=embed`;
+            if (pref.mode === 'custom') {
+                const query = String(pref.query || '').trim();
+                const geo = await geocodeToLatLng(query);
+                if (geo) {
+                    setNavPageMapPref({ ...pref, mode: 'custom', query, lat: geo.lat, lng: geo.lng });
+                    await renderNavPageMapWithSites(geo);
+                    return;
+                }
+                await renderNavPageMapWithSites(null);
                 return;
             }
 
             if (!navigator.geolocation) {
-                iframe.src = `https://www.google.com/maps?q=${encodeURIComponent('台灣')}&z=16&output=embed`;
+                await renderNavPageMapWithSites(null);
                 return;
             }
 
@@ -1304,13 +1598,13 @@
                 const lng = pos && pos.coords ? Number(pos.coords.longitude) : null;
                 if (Number.isFinite(lat) && Number.isFinite(lng)) {
                     setNavPageMapPref({ ...pref, mode: 'current', lat, lng });
-                    iframe.src = `https://www.google.com/maps?q=${encodeURIComponent(`${lat},${lng}`)}&z=16&output=embed`;
+                    await renderNavPageMapWithSites({ lat, lng });
                     return;
                 }
-            } catch (e) {
+            } catch {
             }
 
-            iframe.src = `https://www.google.com/maps?q=${encodeURIComponent('台灣')}&z=16&output=embed`;
+            await renderNavPageMapWithSites(null);
         };
 
         window.renderNavPageSettings = () => {
@@ -1345,18 +1639,15 @@
             const pref = getNavPageMapPref();
             setNavPageMapPref({ ...pref, mode: m });
             window.renderNavPageSettings();
-            if (m === 'current') {
-                const iframe = document.getElementById('nav-page-map-iframe');
-                if (iframe) iframe.src = 'about:blank';
-            }
         };
 
-        window.applyNavPageCustomLocation = () => {
+        window.applyNavPageCustomLocation = async () => {
             const input = document.getElementById('nav-page-map-center-custom-input');
             const query = input ? String(input.value || '').trim() : '';
             const pref = getNavPageMapPref();
-            setNavPageMapPref({ ...pref, mode: 'custom', query, lat: null, lng: null });
-            window.applyNavPageMapCenter();
+            const geo = await geocodeToLatLng(query);
+            setNavPageMapPref({ ...pref, mode: 'custom', query, lat: geo ? geo.lat : null, lng: geo ? geo.lng : null });
+            await window.applyNavPageMapCenter();
         };
 
         window.refreshNavPageCurrentLocation = async () => {
@@ -1535,6 +1826,8 @@
             }
             setProfileStatus('create-site-status', '已儲存', 'success');
             window.closeCreateSiteModal();
+            navPageSitesCache = null;
+            if (typeof window.renderNavPageList === 'function') window.renderNavPageList(true);
         };
 
         window.loadCreateSiteOfficerOptions = async () => {
