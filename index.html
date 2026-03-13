@@ -317,10 +317,9 @@
                     </button>
                 </div>
                 <div class="px-4 pt-3 pb-2 bg-white">
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-2 gap-2">
                         <button id="nav-page-tab-map" onclick="setNavPageView('map')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">地圖</button>
                         <button id="nav-page-tab-list" onclick="setNavPageView('list')" class="py-3 rounded-2xl text-xs bg-red-600 text-white tracking-widest active:scale-95 transition-all">列表</button>
-                        <button id="nav-page-tab-settings" onclick="setNavPageView('settings')" class="py-3 rounded-2xl text-xs bg-gray-100 text-gray-600 tracking-widest active:scale-95 transition-all">設定</button>
                     </div>
                 </div>
                 <div id="nav-page-body" class="flex-1 bg-gray-50 overflow-auto"></div>
@@ -775,10 +774,33 @@
         const LOGIN_PREF_KEY = 'nw_login_pref_v1';
         const PROFILE_AVATAR_KEY_PREFIX = 'nw_profile_avatar_v1_';
 
+        (async () => {
+            try {
+                await setPersistence(auth, browserLocalPersistence);
+            } catch {
+            }
+        })();
+
+        const isLocalPreview = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').catch(() => {});
-            });
+            if (isLocalPreview) {
+                (async () => {
+                    try {
+                        const regs = await navigator.serviceWorker.getRegistrations();
+                        await Promise.all(regs.map((r) => r.unregister()));
+                    } catch {
+                    }
+                    try {
+                        const keys = await caches.keys();
+                        await Promise.all(keys.filter((k) => String(k).startsWith('nw-pt-2026-')).map((k) => caches.delete(k)));
+                    } catch {
+                    }
+                })();
+            } else {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js').catch(() => {});
+                });
+            }
         }
 
         let deferredInstallPrompt = null;
@@ -1221,9 +1243,7 @@
             const v = String(view || '').trim();
             const mapBtn = document.getElementById('nav-page-tab-map');
             const listBtn = document.getElementById('nav-page-tab-list');
-            const settingsBtn = document.getElementById('nav-page-tab-settings');
             const isMap = v === 'map';
-            const isSettings = v === 'settings';
             if (mapBtn) {
                 mapBtn.classList.toggle('bg-red-600', isMap);
                 mapBtn.classList.toggle('text-white', isMap);
@@ -1231,28 +1251,21 @@
                 mapBtn.classList.toggle('text-gray-600', !isMap);
             }
             if (listBtn) {
-                listBtn.classList.toggle('bg-red-600', !isMap && !isSettings);
-                listBtn.classList.toggle('text-white', !isMap && !isSettings);
-                listBtn.classList.toggle('bg-gray-100', isMap || isSettings);
-                listBtn.classList.toggle('text-gray-600', isMap || isSettings);
-            }
-            if (settingsBtn) {
-                settingsBtn.classList.toggle('bg-red-600', isSettings);
-                settingsBtn.classList.toggle('text-white', isSettings);
-                settingsBtn.classList.toggle('bg-gray-100', !isSettings);
-                settingsBtn.classList.toggle('text-gray-600', !isSettings);
+                listBtn.classList.toggle('bg-red-600', !isMap);
+                listBtn.classList.toggle('text-white', !isMap);
+                listBtn.classList.toggle('bg-gray-100', isMap);
+                listBtn.classList.toggle('text-gray-600', isMap);
             }
             const bodyEl = document.getElementById('nav-page-body');
             if (!bodyEl) return;
-            bodyEl.dataset.view = isMap ? 'map' : (isSettings ? 'settings' : 'list');
+            bodyEl.dataset.view = isMap ? 'map' : 'list';
             bodyEl.classList.toggle('overflow-auto', !isMap);
             bodyEl.classList.toggle('overflow-hidden', isMap);
 
             const ensureViews = () => {
                 let mapEl = document.getElementById('nav-page-view-map');
                 let listEl = document.getElementById('nav-page-view-list');
-                let settingsEl = document.getElementById('nav-page-view-settings');
-                if (!mapEl || !listEl || !settingsEl) {
+                if (!mapEl || !listEl) {
                     bodyEl.innerHTML = `
                         <div id="nav-page-view-map" class="hidden w-full h-full min-h-[60vh] bg-gray-50">
                             <div id="nav-page-map" class="w-full h-full min-h-[60vh]"></div>
@@ -1264,32 +1277,27 @@
                                         <i data-lucide="search" class="w-5 h-5"></i>
                                     </div>
                                     <input id="nav-page-list-search" placeholder="搜尋" class="flex-1 px-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-bold" oninput="renderNavPageList()" />
-                                    <button onclick="openCreateSiteModal()" class="w-10 h-10 bg-red-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-200 active:scale-95 transition-all">
+                                    <button id="nav-page-list-add-btn" onclick="openCreateSiteModal()" class="w-10 h-10 bg-red-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-200 active:scale-95 transition-all">
                                         <i data-lucide="plus" class="w-5 h-5"></i>
                                     </button>
                                 </div>
                             </div>
                             <div id="nav-page-view-list-body" class="flex-1 overflow-auto p-5 space-y-4 bg-gray-50"></div>
                         </div>
-                        <div id="nav-page-view-settings" class="hidden w-full h-full overflow-auto p-5 bg-gray-50"></div>
                     `;
                     mapEl = document.getElementById('nav-page-view-map');
                     listEl = document.getElementById('nav-page-view-list');
-                    settingsEl = document.getElementById('nav-page-view-settings');
                 }
-                return { mapEl, listEl, settingsEl };
+                return { mapEl, listEl };
             };
 
-            const { mapEl, listEl, settingsEl } = ensureViews();
+            const { mapEl, listEl } = ensureViews();
             if (mapEl) mapEl.classList.toggle('hidden', !isMap);
-            if (listEl) listEl.classList.toggle('hidden', isMap || isSettings);
-            if (settingsEl) settingsEl.classList.toggle('hidden', !isSettings);
+            if (listEl) listEl.classList.toggle('hidden', isMap);
 
             if (isMap) {
                 try { navPageLeafletHasInitView = false; } catch {}
                 window.applyNavPageMapCenter();
-            } else if (isSettings) {
-                window.renderNavPageSettings();
             } else if (typeof window.renderNavPageList === 'function') {
                 window.renderNavPageList();
             }
@@ -1320,6 +1328,38 @@
             }
         }
 
+        let navPageUsersCache = null;
+        let navPageUsersLoading = false;
+
+        async function loadNavPageUsers(forceReload = false) {
+            if (!forceReload && Array.isArray(navPageUsersCache)) return navPageUsersCache;
+            if (navPageUsersLoading) return Array.isArray(navPageUsersCache) ? navPageUsersCache : [];
+            navPageUsersLoading = true;
+            try {
+                const q = query(usersCollectionRef(), orderBy('email'), limit(500));
+                const snap = await withDbFallback(() => getDocs(q));
+                navPageUsersCache = snap.docs.map((d) => d.data());
+                return navPageUsersCache;
+            } catch (e) {
+                if (e && e.code === 'permission-denied') {
+                    hasDbAccess = false;
+                    navPageUsersCache = [];
+                    return [];
+                }
+                throw e;
+            } finally {
+                navPageUsersLoading = false;
+            }
+        }
+
+        function getAccountsRoleByNavTab(tab) {
+            const t = String(tab || '').trim();
+            if (t === 'ownerList') return '業主';
+            if (t === 'officerList') return '幹部';
+            if (t === 'guardList') return '保全';
+            return '';
+        }
+
         function normalizeSearchText(text) {
             return String(text || '').trim().toLowerCase();
         }
@@ -1338,6 +1378,14 @@
             const code = escapeHtml(String(site?.code || '-'));
             const address = escapeHtml(String(site?.address || '-'));
             const subtitle = escapeHtml(formatSiteSubtitle(site) || '案場');
+            const creatorUid = String(site?.createdBy || site?.createdByUid || '').trim();
+            const creatorNameFromSite = String(site?.createdByName || site?.creatorName || '').trim();
+            let creatorName = creatorNameFromSite;
+            if (!creatorName && creatorUid && Array.isArray(navPageUsersCache)) {
+                const u = navPageUsersCache.find((x) => String(x?.uid || '').trim() === creatorUid);
+                creatorName = String(u?.name || '').trim();
+            }
+            const creatorNameHtml = escapeHtml(creatorName || '-');
             const siteId = String(site?.id || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
             const lat = Number(site?.lat);
             const lng = Number(site?.lng);
@@ -1376,6 +1424,9 @@
                         <div class="text-xs font-bold text-gray-700 truncate min-w-0">${code}</div>
                         <div class="text-xs font-bold text-gray-700 truncate min-w-0">${address}</div>
                     </div>
+                    <div class="mt-4 flex justify-end">
+                        <div class="text-gray-400 text-[11px] tracking-widest truncate">建立者：${creatorNameHtml}</div>
+                    </div>
                 </div>
             `;
         }
@@ -1384,7 +1435,11 @@
             const body = document.getElementById('nav-page-view-list-body');
             if (!body) return;
             const tab = String(activeTab || '').trim();
-            if (tab !== 'ownerAdd') {
+            const addBtn = document.getElementById('nav-page-list-add-btn');
+            const isUsersList = tab === 'ownerList' || tab === 'officerList' || tab === 'guardList';
+            const isSitesList = tab === 'ownerAdd';
+            if (!isUsersList && !isSitesList) {
+                if (addBtn) addBtn.classList.add('hidden');
                 body.innerHTML = `
                     <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
                         <i data-lucide="layers" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
@@ -1393,6 +1448,148 @@
                 `;
                 lucide.createIcons();
                 return;
+            }
+
+            if (isUsersList) {
+                if (addBtn) {
+                    addBtn.classList.remove('hidden');
+                    addBtn.onclick = () => {
+                        accountsRoleFilter = tab === 'ownerList' ? '業主' : (tab === 'officerList' ? '幹部' : '保全');
+                        window.openCreateAccountModal();
+                    };
+                }
+
+                body.innerHTML = `
+                    <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                        <div class="w-12 h-12 border-4 border-red-100 border-t-red-600 rounded-full animate-spin mx-auto"></div>
+                        <p class="mt-4 text-gray-400 font-bold tracking-tight">載入中...</p>
+                    </div>
+                `;
+
+                let users = [];
+                try {
+                    users = await loadNavPageUsers(forceReload);
+                } catch (e) {
+                    if (e && e.code === 'permission-denied') {
+                        hasDbAccess = false;
+                        body.innerHTML = `
+                            <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                                <i data-lucide="shield-alert" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                                <p class="text-gray-400 font-bold tracking-tight">資料庫存取權限不足，無法載入帳號清單</p>
+                            </div>
+                        `;
+                        lucide.createIcons();
+                        return;
+                    }
+                    throw e;
+                }
+
+                const roleFilter = getAccountsRoleByNavTab(tab) || '保全';
+                const search = (document.getElementById('nav-page-list-search')?.value || '').trim().toLowerCase();
+                const filteredBySearch = search
+                    ? users.filter((u) => {
+                        const email = String(u?.email || '').toLowerCase();
+                        const uid = String(u?.uid || '').toLowerCase();
+                        const name = String(u?.name || '').toLowerCase();
+                        const phone = String(u?.phone || '').toLowerCase();
+                        const lineId = String(u?.lineId || '').toLowerCase();
+                        return email.includes(search) || uid.includes(search) || name.includes(search) || phone.includes(search) || lineId.includes(search);
+                    })
+                    : users;
+                const filtered = filteredBySearch.filter((u) => {
+                    const role = (u && u.role && ROLE_DEFS[u.role]) ? u.role : '保全';
+                    return role === roleFilter && !u?.hidden;
+                });
+
+                accountsUsersByUid = {};
+                filteredBySearch.forEach((u) => {
+                    const uid = String(u?.uid || '').trim();
+                    if (!uid) return;
+                    accountsUsersByUid[uid] = u;
+                });
+
+                if (filtered.length === 0) {
+                    body.innerHTML = `
+                        <div class="p-10 text-center bg-white rounded-[2rem] shadow-sm">
+                            <i data-lucide="user-x" class="w-12 h-12 text-red-200 mx-auto mb-4"></i>
+                            <p class="text-gray-400 font-bold tracking-tight">找不到帳號</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+
+                body.innerHTML = filtered.map((u) => {
+                    const uid = String(u.uid || '').trim();
+                    const email = escapeHtml(u.email || '-');
+                    const name = escapeHtml(u.name || '-');
+                    const phone = escapeHtml(u.phone || '-');
+                    const lineId = escapeHtml(u.lineId || '-');
+                    const avatar = escapeHtml(u.avatarDataUrl || '');
+                    const approvalStatus = String(u.approvalStatus || '');
+                    const canApprove = Boolean(currentUserData && currentUserData.role === '系統管理員');
+                    const badgeHtml = approvalStatus === 'pending'
+                        ? (canApprove
+                            ? `<span onclick="openApprovalModal('${uid}')" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] tracking-widest font-black cursor-pointer select-none active:scale-95 transition-transform whitespace-nowrap shrink-0">待審核</span>`
+                            : `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] tracking-widest font-black whitespace-nowrap shrink-0">待審核</span>`)
+                        : (approvalStatus === 'approved'
+                            ? (canApprove
+                                ? `<span onclick="openRevertApprovalModal('${uid}')" class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] tracking-widest font-black cursor-pointer select-none active:scale-95 transition-transform whitespace-nowrap shrink-0">審核通過</span>`
+                                : `<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] tracking-widest font-black whitespace-nowrap shrink-0">審核通過</span>`)
+                            : '');
+                    const guardDocsButtons = roleFilter === '保全' ? `
+                        <button onclick="openGuardDocsModal('${uid}','identity')" class="w-10 h-10 rounded-2xl bg-gray-100 text-gray-700 active:scale-95 transition-all flex items-center justify-center">
+                            <i data-lucide="id-card" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="openGuardDocsModal('${uid}','bankbook')" class="w-10 h-10 rounded-2xl bg-gray-100 text-gray-700 active:scale-95 transition-all flex items-center justify-center">
+                            <i data-lucide="book" class="w-5 h-5"></i>
+                        </button>
+                    ` : '';
+                    const deleteButton = roleFilter === '系統管理員'
+                        ? ''
+                        : `<button onclick="deleteAccountFromList('${uid}')" class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 active:scale-95 transition-all flex items-center justify-center">
+                                <i data-lucide="trash-2" class="w-5 h-5"></i>
+                            </button>`;
+                    return `
+                        <div class="flat-card bg-white p-5 border-none shadow-sm">
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <div class="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center shrink-0">
+                                        ${avatar ? `<img src="${avatar}" class="w-full h-full object-cover" alt="大頭照">` : `<i data-lucide="user" class="w-6 h-6 text-gray-400"></i>`}
+                                    </div>
+                                    ${badgeHtml}
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    ${guardDocsButtons}
+                                    <button onclick="openEditAccountModal('${uid}')" class="w-10 h-10 rounded-2xl bg-gray-100 text-gray-700 active:scale-95 transition-all flex items-center justify-center">
+                                        <i data-lucide="pencil" class="w-5 h-5"></i>
+                                    </button>
+                                    ${deleteButton}
+                                </div>
+                            </div>
+                            <div class="mt-4 grid grid-cols-4 gap-3">
+                                <div class="text-gray-400 text-[11px] tracking-widest truncate">姓名</div>
+                                <div class="text-gray-400 text-[11px] tracking-widest truncate">Email</div>
+                                <div class="text-gray-400 text-[11px] tracking-widest truncate">手機號碼</div>
+                                <div class="text-gray-400 text-[11px] tracking-widest truncate">Line ID</div>
+                            </div>
+                            <div class="mt-1 grid grid-cols-4 gap-3">
+                                <div class="text-xs font-bold text-gray-700 truncate min-w-0">${name}</div>
+                                <div class="text-xs font-bold text-gray-700 truncate min-w-0">${email}</div>
+                                <div class="text-xs font-bold text-gray-700 truncate min-w-0">${phone}</div>
+                                <div class="text-xs font-bold text-gray-700 truncate min-w-0">${lineId}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                lucide.createIcons();
+                return;
+            }
+
+            if (addBtn) {
+                addBtn.classList.remove('hidden');
+                addBtn.onclick = () => window.openCreateSiteModal();
             }
 
             body.innerHTML = `
@@ -1454,11 +1651,13 @@
                 return;
             }
 
+            try { await loadNavPageUsers(false); } catch {}
             body.innerHTML = filtered.map(renderNavPageSiteCard).join('');
             lucide.createIcons();
         };
 
-        const NAV_PAGE_MAP_CENTER_PREF_KEY = 'nw_nav_page_map_center_v1';
+        const NAV_PAGE_FALLBACK_CENTER = { lat: 23.69781, lng: 120.960515 };
+        let navPageLastKnownPos = null;
 
         function parseLatLngFromQuery(query) {
             const q = String(query || '').trim();
@@ -1470,6 +1669,22 @@
             if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
             if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
             return { lat, lng };
+        }
+
+        async function getNavPageCurrentLatLng() {
+            if (!navigator.geolocation) return null;
+            try {
+                const pos = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 8000, maximumAge: 300000 });
+                });
+                const lat = pos && pos.coords ? Number(pos.coords.latitude) : NaN;
+                const lng = pos && pos.coords ? Number(pos.coords.longitude) : NaN;
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+                navPageLastKnownPos = { lat, lng };
+                return { lat, lng };
+            } catch {
+                return null;
+            }
         }
 
         let navPageLeafletMap = null;
@@ -1697,154 +1912,217 @@
             }
         }
 
-        function getNavPageMapPref() {
-            try {
-                const raw = localStorage.getItem(NAV_PAGE_MAP_CENTER_PREF_KEY);
-                if (!raw) return { mode: 'current', query: '', lat: null, lng: null };
-                const pref = JSON.parse(raw);
-                const mode = pref && pref.mode === 'custom' ? 'custom' : 'current';
-                const query = pref && typeof pref.query === 'string' ? pref.query : '';
-                const lat = pref && typeof pref.lat === 'number' ? pref.lat : null;
-                const lng = pref && typeof pref.lng === 'number' ? pref.lng : null;
-                return { mode, query, lat, lng };
-            } catch (e) {
-                return { mode: 'current', query: '', lat: null, lng: null };
-            }
-        }
-
-        function setNavPageMapPref(nextPref) {
-            const p = nextPref && typeof nextPref === 'object' ? nextPref : {};
-            const mode = p.mode === 'custom' ? 'custom' : 'current';
-            const query = typeof p.query === 'string' ? p.query : '';
-            const lat = typeof p.lat === 'number' ? p.lat : null;
-            const lng = typeof p.lng === 'number' ? p.lng : null;
-            localStorage.setItem(NAV_PAGE_MAP_CENTER_PREF_KEY, JSON.stringify({ mode, query, lat, lng }));
-            return { mode, query, lat, lng };
-        }
-
-        async function geocodeToLatLng(query) {
-            const parsed = parseLatLngFromQuery(query);
-            if (parsed) return parsed;
-            const q = String(query || '').trim();
-            if (!q) return null;
-            try {
-                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`;
-                const res = await fetch(url, { method: 'GET', headers: { Accept: 'application/json' } });
-                if (!res.ok) return null;
-                const json = await res.json();
-                const item = Array.isArray(json) ? json[0] : null;
-                const lat = item ? Number(item.lat) : NaN;
-                const lng = item ? Number(item.lon) : NaN;
-                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-                if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
-                return { lat, lng };
-            } catch {
-                return null;
-            }
-        }
-
         window.applyNavPageMapCenter = async () => {
-            const pref = getNavPageMapPref();
-            const hasCoords = Number.isFinite(pref.lat) && Number.isFinite(pref.lng);
-            if (hasCoords) {
-                await renderNavPageMapWithSites({ lat: pref.lat, lng: pref.lng });
-                return;
-            }
-
-            if (pref.mode === 'custom') {
-                const query = String(pref.query || '').trim();
-                const geo = await geocodeToLatLng(query);
-                if (geo) {
-                    setNavPageMapPref({ ...pref, mode: 'custom', query, lat: geo.lat, lng: geo.lng });
-                    await renderNavPageMapWithSites(geo);
-                    return;
-                }
-                await renderNavPageMapWithSites(null);
-                return;
-            }
-
-            await renderNavPageMapWithSites(null);
+            const pos = await getNavPageCurrentLatLng();
+            await renderNavPageMapForActiveTab(pos || navPageLastKnownPos || NAV_PAGE_FALLBACK_CENTER);
         };
 
-        window.renderNavPageSettings = () => {
-            const wrap = document.getElementById('nav-page-view-settings');
-            if (!wrap) return;
-            const pref = getNavPageMapPref();
-            const isCurrent = pref.mode === 'current';
-            const q = String(pref.query || '').trim();
+        const NAV_PAGE_GEOCODE_CACHE_KEY = 'nw-pt-2026-nav-geocode-cache-v1';
+        let navPageGeocodeCache = null;
+        let navPageMarkerIconCache = null;
 
-            wrap.innerHTML = `
-                <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="text-[#333333] text-sm tracking-widest font-black">地圖預設中心</div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="nav-page-map-center-current" onclick="setNavPageMapCenterMode('current')" class="py-3 rounded-2xl text-xs tracking-widest active:scale-95 transition-all ${isCurrent ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600'}">目前位置</button>
-                        <button id="nav-page-map-center-custom" onclick="setNavPageMapCenterMode('custom')" class="py-3 rounded-2xl text-xs tracking-widest active:scale-95 transition-all ${!isCurrent ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600'}">自訂位置</button>
-                    </div>
-                    <div id="nav-page-map-center-custom-panel" class="${isCurrent ? 'hidden' : ''} mt-4 space-y-2">
-                        <input id="nav-page-map-center-custom-input" value="${escapeHtml(q)}" placeholder="輸入地址 / 地標 / 座標" class="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-white text-sm tracking-widest focus:outline-none focus:ring-2 focus:ring-red-200" />
-                        <button onclick="applyNavPageCustomLocation()" class="w-full py-3 rounded-2xl text-xs bg-red-600 text-white tracking-widest active:scale-95 transition-all">套用</button>
-                    </div>
-                    <div id="nav-page-map-center-current-panel" class="${isCurrent ? '' : 'hidden'} mt-4">
-                        <button onclick="refreshNavPageCurrentLocation()" class="w-full py-3 rounded-2xl text-xs bg-gray-100 text-gray-700 tracking-widest active:scale-95 transition-all">更新目前位置</button>
-                    </div>
+        function getNavPageMarkerIcon(kind) {
+            const k = String(kind || '').trim();
+            const urlMap = {
+                owner: 'https://maps.google.com/mapfiles/ms/icons/purple-dot.png',
+                site: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+                officer: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                guard: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
+            };
+            const iconUrl = urlMap[k] || 'https://maps.google.com/mapfiles/ms/icons/red-dot.png';
+            if (!navPageMarkerIconCache || typeof navPageMarkerIconCache !== 'object') navPageMarkerIconCache = {};
+            if (navPageMarkerIconCache[iconUrl]) return navPageMarkerIconCache[iconUrl];
+            const icon = L.icon({
+                iconUrl,
+                iconSize: [34, 34],
+                iconAnchor: [17, 17],
+                popupAnchor: [0, -17]
+            });
+            navPageMarkerIconCache[iconUrl] = icon;
+            return icon;
+        }
+
+        function loadNavPageGeocodeCache() {
+            if (navPageGeocodeCache && typeof navPageGeocodeCache === 'object') return navPageGeocodeCache;
+            try {
+                const raw = localStorage.getItem(NAV_PAGE_GEOCODE_CACHE_KEY) || '';
+                const parsed = raw ? JSON.parse(raw) : null;
+                navPageGeocodeCache = (parsed && typeof parsed === 'object') ? parsed : {};
+            } catch {
+                navPageGeocodeCache = {};
+            }
+            return navPageGeocodeCache;
+        }
+
+        function saveNavPageGeocodeCache() {
+            try {
+                if (!navPageGeocodeCache || typeof navPageGeocodeCache !== 'object') return;
+                localStorage.setItem(NAV_PAGE_GEOCODE_CACHE_KEY, JSON.stringify(navPageGeocodeCache));
+            } catch {
+            }
+        }
+
+        async function geocodeAddressCached(address) {
+            const raw = String(address || '').trim();
+            if (!raw) return null;
+            const parsed = parseLatLngFromQuery(raw);
+            if (parsed) return parsed;
+
+            const key = raw.replace(/\s+/g, ' ').trim();
+            const cache = loadNavPageGeocodeCache();
+            const hit = cache && cache[key] && typeof cache[key] === 'object' ? cache[key] : null;
+            const hitLat = hit ? Number(hit.lat) : NaN;
+            const hitLng = hit ? Number(hit.lng) : NaN;
+            if (Number.isFinite(hitLat) && Number.isFinite(hitLng)) return { lat: hitLat, lng: hitLng };
+
+            const res = await geocodeAddress(key);
+            const lat = Number(res?.lat);
+            const lng = Number(res?.lng);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+            cache[key] = { lat, lng, ts: Date.now() };
+            const keys = Object.keys(cache || {});
+            if (keys.length > 600) {
+                const sorted = keys
+                    .map((k) => ({ k, ts: Number(cache?.[k]?.ts || 0) }))
+                    .sort((a, b) => (b.ts - a.ts));
+                const keep = new Set(sorted.slice(0, 500).map((x) => x.k));
+                keys.forEach((k) => { if (!keep.has(k)) delete cache[k]; });
+            }
+            saveNavPageGeocodeCache();
+            return { lat, lng };
+        }
+
+        function renderUserMapPopupHtml(u, extraLines) {
+            const name = escapeHtml(String(u?.name || '-'));
+            const email = escapeHtml(String(u?.email || '-'));
+            const phone = escapeHtml(String(u?.phone || '-'));
+            const lineId = escapeHtml(String(u?.lineId || '-'));
+            const extras = Array.isArray(extraLines) ? extraLines.filter(Boolean) : [];
+            return `
+                <div class="text-sm tracking-widest">
+                    <div class="font-black text-gray-900">${name}</div>
+                    <div class="text-[11px] text-gray-500 mt-1">${email}</div>
+                    <div class="text-[11px] text-gray-600 mt-1">手機：${phone}</div>
+                    <div class="text-[11px] text-gray-600 mt-1">Line：${lineId}</div>
+                    ${extras.length ? `<div class="text-[11px] text-gray-600 mt-2 space-y-1">${extras.map((t) => `<div>${escapeHtml(t)}</div>`).join('')}</div>` : ''}
                 </div>
             `;
-        };
+        }
 
-        window.setNavPageMapCenterMode = (mode) => {
-            const m = String(mode || '').trim() === 'custom' ? 'custom' : 'current';
-            const pref = getNavPageMapPref();
-            setNavPageMapPref({ ...pref, mode: m });
-            window.renderNavPageSettings();
-        };
+        async function renderNavPageMapWithUsers(center, roleFilter, forceReload = false) {
+            const map = ensureNavPageLeafletMap();
+            if (!map) return;
 
-        window.applyNavPageCustomLocation = async () => {
-            const input = document.getElementById('nav-page-map-center-custom-input');
-            const query = input ? String(input.value || '').trim() : '';
-            const pref = getNavPageMapPref();
-            const geo = await geocodeToLatLng(query);
-            if (geo && Number.isFinite(geo.lat) && Number.isFinite(geo.lng)) {
-                setNavPageMapPref({ ...pref, mode: 'custom', query, lat: geo.lat, lng: geo.lng });
-                const viewWrap = document.getElementById('nav-page-view-map');
-                const isMapVisible = viewWrap && !viewWrap.classList.contains('hidden');
-                try { navPageLeafletHasInitView = false; } catch {}
-                if (isMapVisible) {
-                    await renderNavPageMapWithSites(geo, true);
-                    return;
-                }
-            } else {
-                setNavPageMapPref({ ...pref, mode: 'custom', query, lat: null, lng: null });
+            const viewWrap = document.getElementById('nav-page-view-map');
+            if (!viewWrap || viewWrap.classList.contains('hidden')) return;
+
+            setTimeout(() => { try { map.invalidateSize(); } catch {} }, 0);
+
+            if (navPageLeafletMarkers) navPageLeafletMarkers.clearLayers();
+            clearRouteLayer();
+            if (navPageLeafletCenterMarker) {
+                try { navPageLeafletCenterMarker.remove(); } catch {}
+                navPageLeafletCenterMarker = null;
             }
-            await window.applyNavPageMapCenter();
-        };
 
-        window.refreshNavPageCurrentLocation = async () => {
-            const pref = getNavPageMapPref();
-            setNavPageMapPref({ ...pref, mode: 'current', lat: null, lng: null });
+            const centerLat = Number(center?.lat);
+            const centerLng = Number(center?.lng);
+            const hasCenter = Number.isFinite(centerLat) && Number.isFinite(centerLng);
+            const defaultCenter = { lat: 23.69781, lng: 120.960515 };
+            const centerResolved = hasCenter ? { lat: centerLat, lng: centerLng } : defaultCenter;
 
-            if (!navigator.geolocation) {
-                await window.applyNavPageMapCenter();
+            const avatarUrl = getCurrentUserAvatarUrl();
+            const avatarIconUrl = await buildAvatarIconDataUrl(avatarUrl);
+            const meIcon = avatarIconUrl
+                ? L.icon({
+                    iconUrl: avatarIconUrl,
+                    iconSize: [48, 48],
+                    iconAnchor: [24, 24],
+                    popupAnchor: [0, -24]
+                })
+                : L.divIcon({
+                    html: '<div style="width:14px;height:14px;border:4px solid #FF7F7F;border-radius:50%;background:#fff;"></div>',
+                    className: 'leaflet-div-avatar',
+                    iconSize: [22, 22],
+                    iconAnchor: [11, 11]
+                });
+            navPageLeafletCenterMarker = L.marker([centerResolved.lat, centerResolved.lng], { icon: meIcon }).addTo(map);
+
+            let users = [];
+            try { users = await loadNavPageUsers(forceReload); } catch { users = []; }
+            const role = (roleFilter && ROLE_DEFS[roleFilter]) ? roleFilter : '';
+            const shouldFilterHidden = role !== '業主';
+            const filtered = role
+                ? users.filter((u) => {
+                    const r = (u && u.role && ROLE_DEFS[u.role]) ? u.role : '保全';
+                    return r === role && (!shouldFilterHidden || !u?.hidden);
+                })
+                : [];
+
+            const coords = [];
+            const roleIcon = getNavPageMarkerIcon(role === '業主' ? 'owner' : (role === '幹部' ? 'officer' : 'guard'));
+
+            for (const u of filtered) {
+                if (role === '業主') {
+                    const addr = String(u?.ownerProfile?.address || '').trim();
+                    const pos = await geocodeAddressCached(addr);
+                    const lat = Number(pos?.lat);
+                    const lng = Number(pos?.lng);
+                    if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+                    coords.push([lat, lng]);
+                    const popup = renderUserMapPopupHtml(u, addr ? [`地址：${addr}`] : []);
+                    const marker = L.marker([lat, lng], { icon: roleIcon }).bindPopup(popup);
+                    if (navPageLeafletMarkers) navPageLeafletMarkers.addLayer(marker);
+                    continue;
+                }
+
+                const lat = Number(u?.lastLat);
+                const lng = Number(u?.lastLng);
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+                coords.push([lat, lng]);
+                const geoAt = String(u?.lastGeoAt || '').trim();
+                const popup = renderUserMapPopupHtml(u, geoAt ? [`定位時間：${geoAt}`] : [`座標：${lat.toFixed(6)}, ${lng.toFixed(6)}`]);
+                const marker = L.marker([lat, lng], { icon: roleIcon }).bindPopup(popup);
+                if (navPageLeafletMarkers) navPageLeafletMarkers.addLayer(marker);
+            }
+
+            if (navPageLeafletPendingFocus) {
+                const fLat = Number(navPageLeafletPendingFocus.lat);
+                const fLng = Number(navPageLeafletPendingFocus.lng);
+                const fZoom = Number(navPageLeafletPendingFocus.zoom);
+                navPageLeafletPendingFocus = null;
+                if (Number.isFinite(fLat) && Number.isFinite(fLng)) {
+                    map.setView([fLat, fLng], Number.isFinite(fZoom) ? fZoom : 16);
+                    navPageLeafletHasInitView = true;
+                }
                 return;
             }
 
-            try {
-                const pos = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 8000, maximumAge: 300000 });
-                });
-                const lat = pos && pos.coords ? Number(pos.coords.latitude) : null;
-                const lng = pos && pos.coords ? Number(pos.coords.longitude) : null;
-                if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                    setNavPageMapPref({ ...pref, mode: 'current', lat, lng });
-                    await renderNavPageMapWithSites({ lat, lng });
-                    return;
+            if (!navPageLeafletHasInitView) {
+                if (coords.length > 0) {
+                    let bounds = L.latLngBounds(coords);
+                    bounds = bounds.extend([centerResolved.lat, centerResolved.lng]);
+                    map.fitBounds(bounds, { padding: [28, 28] });
+                } else {
+                    map.setView([centerResolved.lat, centerResolved.lng], 15);
                 }
-            } catch {
+                navPageLeafletHasInitView = true;
             }
+        }
 
-            await window.applyNavPageMapCenter();
-        };
+        async function renderNavPageMapForActiveTab(center, forceReload = false) {
+            const tab = String(activeTab || '').trim();
+            if (tab === 'ownerAdd') {
+                await renderNavPageMapWithSites(center, forceReload);
+                return;
+            }
+            const role = getAccountsRoleByNavTab(tab);
+            if (role) {
+                await renderNavPageMapWithUsers(center, role, forceReload);
+                return;
+            }
+            await renderNavPageMapWithSites(center, forceReload);
+        }
 
         async function renderNavPageMapWithSites(center, forceReload = false) {
             const map = ensureNavPageLeafletMap();
@@ -1888,6 +2166,7 @@
             try { sites = await loadNavPageSites(forceReload); } catch { sites = []; }
 
             const coords = [];
+            const siteIcon = getNavPageMarkerIcon('site');
             sites.forEach((s) => {
                 const lat = Number(s?.lat);
                 const lng = Number(s?.lng);
@@ -1906,13 +2185,7 @@
                         </div>
                     </div>
                 `;
-                const redIcon = L.icon({
-                    iconUrl: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                    iconSize: [34, 34],
-                    iconAnchor: [17, 17],
-                    popupAnchor: [0, -17]
-                });
-                const marker = L.marker([lat, lng], { icon: redIcon }).bindPopup(popup);
+                const marker = L.marker([lat, lng], { icon: siteIcon }).bindPopup(popup);
                 if (navPageLeafletMarkers) navPageLeafletMarkers.addLayer(marker);
             });
 
@@ -2024,35 +2297,7 @@
 
             navPageLeafletPendingFocus = null;
 
-            const pref = getNavPageMapPref();
-            const defaultCenter = { lat: 23.69781, lng: 120.960515 };
-            let target = null;
-
-            if (Number.isFinite(pref.lat) && Number.isFinite(pref.lng)) {
-                target = { lat: Number(pref.lat), lng: Number(pref.lng) };
-            } else if (pref.mode === 'custom') {
-                const q = String(pref.query || '').trim();
-                const geo = await geocodeToLatLng(q);
-                if (geo && Number.isFinite(geo.lat) && Number.isFinite(geo.lng)) {
-                    setNavPageMapPref({ ...pref, mode: 'custom', query: q, lat: geo.lat, lng: geo.lng });
-                    target = geo;
-                }
-            } else {
-                try {
-                    const pos = await new Promise((resolve) => {
-                        if (!navigator.geolocation) { resolve(null); return; }
-                        navigator.geolocation.getCurrentPosition((p) => resolve(p), () => resolve(null), { enableHighAccuracy: true, timeout: 5000, maximumAge: 300000 });
-                    });
-                    const lat = pos && pos.coords ? Number(pos.coords.latitude) : NaN;
-                    const lng = pos && pos.coords ? Number(pos.coords.longitude) : NaN;
-                    if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                        setNavPageMapPref({ ...pref, mode: 'current', lat, lng });
-                        target = { lat, lng };
-                    }
-                } catch {}
-            }
-
-            if (!target) target = defaultCenter;
+            const target = (await getNavPageCurrentLatLng()) || navPageLastKnownPos || NAV_PAGE_FALLBACK_CENTER;
 
             try {
                 map.setView([target.lat, target.lng], 15);
@@ -2062,7 +2307,7 @@
             if (navPageLeafletCenterMarker && navPageLeafletCenterMarker.setLatLng) {
                 try { navPageLeafletCenterMarker.setLatLng([target.lat, target.lng]); } catch {}
             } else {
-                await renderNavPageMapWithSites(target);
+                await renderNavPageMapForActiveTab(target);
                 try { map.setView([target.lat, target.lng], 15); } catch {}
                 navPageLeafletHasInitView = true;
             }
@@ -2092,17 +2337,8 @@
             const dest = { lat: Number(lat), lng: Number(lng) };
             if (!Number.isFinite(dest.lat) || !Number.isFinite(dest.lng)) return;
 
-            const pref = getNavPageMapPref();
             let origin = null;
-            try {
-                const pos = await new Promise((resolve) => {
-                    if (!navigator.geolocation) { resolve(null); return; }
-                    navigator.geolocation.getCurrentPosition((p) => resolve(p), () => resolve(null), { enableHighAccuracy: true, timeout: 5000, maximumAge: 300000 });
-                });
-                if (pos && pos.coords) origin = { lat: Number(pos.coords.latitude), lng: Number(pos.coords.longitude) };
-            } catch {}
-            if (!origin && Number.isFinite(pref.lat) && Number.isFinite(pref.lng)) origin = { lat: Number(pref.lat), lng: Number(pref.lng) };
-            if (!origin) origin = { lat: 23.69781, lng: 120.960515 };
+            origin = (await getNavPageCurrentLatLng()) || navPageLastKnownPos || NAV_PAGE_FALLBACK_CENTER;
             clearRouteLayer();
             setRouteInfoText('路線計算中…');
             try {
@@ -2121,11 +2357,7 @@
                         iconSize: [20, 20],
                         iconAnchor: [10, 10]
                     });
-                const destIcon = L.icon({
-                    iconUrl: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                    iconSize: [34, 34],
-                    iconAnchor: [17, 17]
-                });
+                const destIcon = getNavPageMarkerIcon('site');
 
                 const startMarker = L.marker([origin.lat, origin.lng], { icon: meIcon });
                 const endMarker = L.marker([dest.lat, dest.lng], { icon: destIcon });
@@ -2570,6 +2802,31 @@
             }
         }
 
+        async function geocodeAddressByArcGisWorld(address) {
+            const q = String(address || '').trim();
+            if (!q) return null;
+            try {
+                const url = `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?SingleLine=${encodeURIComponent(q)}&f=pjson&maxLocations=1&outFields=Match_addr,Addr_type&outSR=4326`;
+                const resp = await fetch(url, { headers: { 'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.6' } });
+                if (!resp.ok) return null;
+                const data = await resp.json();
+                const cand = data && Array.isArray(data.candidates) && data.candidates[0] ? data.candidates[0] : null;
+                if (!cand) return null;
+                const score = Number(cand.score);
+                if (Number.isFinite(score) && score < 70) return null;
+                const latText = String(cand?.location?.y ?? '').trim();
+                const lngText = String(cand?.location?.x ?? '').trim();
+                const lat = Number(latText);
+                const lng = Number(lngText);
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+                const matchAddr = String(cand?.address || cand?.attributes?.Match_addr || '').trim();
+                const area = extractTwAreaFromText(matchAddr) || extractTwAreaFromText(q) || '';
+                return { lat, lng, latText, lngText, area };
+            } catch {
+                return null;
+            }
+        }
+
         async function geocodeAddressByMapsCo(address) {
             const q = String(address || '').trim();
             if (!q) return null;
@@ -2605,6 +2862,10 @@
 
             for (const q of variants) {
                 const res = await geocodeAddressByNominatim(q);
+                if (res) return res;
+            }
+            for (const q of variants) {
+                const res = await geocodeAddressByArcGisWorld(q);
                 if (res) return res;
             }
             for (const q of variants) {
@@ -3938,6 +4199,21 @@
                 setTile('ownerSettings', { label: '功能', icon: 'grid-3x3', onClick: `openNavPageModal('功能', 'ownerSettings')` });
                 setTile('officerSettings', { label: '群組', icon: 'users', onClick: `openNavPageModal('群組', 'officerSettings')` });
                 setTile('guardSettings', { label: '設定', icon: 'settings', onClick: `openNavPageModal('設定', 'guardSettings')` });
+                lucide.createIcons();
+                return;
+            }
+
+            const isOfficer = role === '幹部';
+            if (isOfficer) {
+                setTile('ownerList', { label: '聊天', icon: 'message-circle', onClick: `openNavPageModal('聊天', 'ownerList')` });
+                setTile('officerList', { label: '紀錄', icon: 'clipboard-list', onClick: `openNavPageModal('紀錄', 'officerList')` });
+                setTile('guardList', { label: '保全', icon: 'shield', onClick: `openNavPageModal('保全', 'guardList')` });
+                setTile('ownerAdd', { label: '案場', icon: 'building-2', onClick: `openNavPageModal('案場', 'ownerAdd')` });
+                setTile('officerAdd', { label: '任務', icon: 'briefcase', onClick: `openNavPageModal('任務', 'officerAdd')` });
+                setTile('guardAdd', { label: '廣告', icon: 'megaphone', onClick: `openNavPageModal('廣告', 'guardAdd')` });
+                setTile('ownerSettings', { label: '功能', icon: 'grid-3x3', onClick: `openNavPageModal('功能', 'ownerSettings')` });
+                setTile('officerSettings', { label: '個人', icon: 'user', onClick: `openProfileModal()` });
+                setTile('guardSettings', { label: '系統', icon: 'settings', onClick: `openNavPageModal('系統', 'guardSettings')` });
                 lucide.createIcons();
                 return;
             }
